@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
 import TabBarIcon from "./src/components/TabBarIcon"
 import {Platform, Text} from "react-native"
+import Colors from "./src/constants/Colors"
 
 import UserScreen from "./src/screens/UserScreen";
 import MapScreen from "./src/screens/MapScreen";
@@ -71,7 +72,7 @@ const MoreStack = createStackNavigator({
   More: MoreScreen
 });
 
-AlarmStack.navigationOptions = {
+MoreStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
       <TabBarIcon
           focused={focused}
@@ -84,7 +85,7 @@ AlarmStack.navigationOptions = {
   ),
 };
 
-AlarmStack.path = '';
+MoreStack.path = '';
 
 export default createAppContainer(
     createBottomTabNavigator(
@@ -96,10 +97,16 @@ export default createAppContainer(
 
         },
         {
-          tabBarOptions: {
-            showLabel: false, // hide labels
-          },
-          initialRouteName: "User"
+            tabBarOptions: {
+              showLabel: false, // hide labels
+              style: {
+                  backgroundColor: Colors.tabBar,
+              },
+              tabStyle: {
+                  backgroundColor: Colors.tabBar,
+              },
+            },
+            initialRouteName: "User"
         }
     )
 );
