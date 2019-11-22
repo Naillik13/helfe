@@ -40,8 +40,8 @@ MapStack.navigationOptions = {
           focused={focused}
           name={
             Platform.OS === 'ios'
-                ? `ios-locate`
-                : 'md-locate'
+                ? `ios-map`
+                : 'md-map'
           }
       />
   ),
@@ -78,8 +78,8 @@ MoreStack.navigationOptions = {
           focused={focused}
           name={
             Platform.OS === 'ios'
-                ? `ios-more`
-                : 'md-more'
+                ? `ios-information`
+                : 'md-information'
           }
       />
   ),
