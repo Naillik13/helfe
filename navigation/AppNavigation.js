@@ -86,24 +86,12 @@ MoreStack.navigationOptions = {
 
 MoreStack.path = '';
 
-const LoginStack = createStackNavigator({
-    Login: LoginScreen
-});
-
-LoginStack.navigationOptions = {
-    tabBarVisible: false
-};
-
-LoginStack.path = '';
-
 export default createBottomTabNavigator(
     {
         User: UserStack,
         Alarm: AlarmStack,
         Map: MapStack,
         More: MoreStack,
-        Login: LoginStack
-
     },
     {
         tabBarOptions: {
@@ -115,6 +103,6 @@ export default createBottomTabNavigator(
                 backgroundColor: Colors.tabBar,
             },
         },
-        initialRouteName: "Login"
+        initialRouteName: "User"
     }
 )

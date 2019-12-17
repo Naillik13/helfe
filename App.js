@@ -1,9 +1,11 @@
 import React from 'react';
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
 import AppNavigation from "./navigation/AppNavigation";
 
 import * as firebase from "firebase";
+import LoginScreen from "./src/screens/LoginScreen";
+import {createStackNavigator} from "react-navigation-stack";
 
 firebase.initializeApp({
     apiKey: "AIzaSyClvKKxYhr7sx9QoICnOjUQRMLzx1EFkbk",
@@ -13,6 +15,20 @@ firebase.initializeApp({
     storageBucket: "rnfirebase-1d7bf.appspot.com",
 });
 
-export default createAppContainer(
-    AppNavigation
-);
+const LoginStack = createStackNavigator({
+    Login: LoginScreen
+});
+
+LoginStack.path = '';
+
+const App = createSwitchNavigator({
+    Auth: {
+        screen: LoginStack,
+    },
+    App: {
+        screen: AppNavigation,
+    },
+});
+
+export default createAppContainer(App);
+

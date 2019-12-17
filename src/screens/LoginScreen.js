@@ -12,6 +12,7 @@ export default class LoginScreen extends React.Component {
 
         try {
             await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
+            this.props.navigation.navigate('App')
             console.log("Logged in")
         } catch (error) {
             console.log(error.toString())
