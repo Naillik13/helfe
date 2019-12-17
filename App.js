@@ -6,6 +6,7 @@ import AppNavigation from "./navigation/AppNavigation";
 import * as firebase from "firebase";
 import LoginScreen from "./src/screens/LoginScreen";
 import {createStackNavigator} from "react-navigation-stack";
+import AuthLoadingScreen from "./src/screens/AuthLoadingScreen";
 
 firebase.initializeApp({
     apiKey: "AIzaSyClvKKxYhr7sx9QoICnOjUQRMLzx1EFkbk",
@@ -22,6 +23,9 @@ const LoginStack = createStackNavigator({
 LoginStack.path = '';
 
 const App = createSwitchNavigator({
+    AuthLoading : {
+        screen: AuthLoadingScreen
+    },
     Auth: {
         screen: LoginStack,
     },
