@@ -1,5 +1,5 @@
 import React from 'react'
-import {ActivityIndicator, StyleSheet, View} from 'react-native'
+import {ActivityIndicator, AsyncStorage, StyleSheet, View} from 'react-native'
 import firebase from "firebase";
 
 
@@ -10,15 +10,27 @@ export default class LoginScreen extends React.Component {
     }
 
     checkSession = () => {
-        // Not working
-        const user = firebase.auth().currentUser;
-
-        if (user) {
-            this.props.navigation.navigate('App')
-        } else {
-            this.props.navigation.navigate('Auth')
-        }
+        this._retrieveUser()
+            .then(res => {
+                if (res) {
+                    this.props.navigation.navigate('App')
+                } else {
+                    this.props.navigation.navigate('Auth')
+                }
+            })
     }
+
+    _retrieveUser = async () => {
+        try {
+            const value = await AsyncStorage.getItem('@User');
+            if (value !== null) {
+                console.log(value);
+                return value
+            }
+        } catch (error) {
+            alert("An error has occurred while retrieving current user");
+        }
+    };
 
     render(){
         return(

@@ -1,28 +1,44 @@
 import React from 'react'
-import {View, TextInput, Button, Image, TouchableOpacity, Text, StyleSheet} from 'react-native'
+import {View, TextInput, AsyncStorage, Image, TouchableOpacity, Text, StyleSheet} from 'react-native'
 import firebase from "firebase";
-
 
 export default class LoginScreen extends React.Component {
     constructor(props){
         super(props);
+        this.state = {
+            email: "",
+            password: ""
+        }
     }
 
-    login = () => {
+    _saveUserAsyncStorage = async (user) => {
+        try {
+            await AsyncStorage.setItem('@User', JSON.stringify(user));
+        } catch (error) {
+            console.log(error.toString())
+        }
+    }
+
+    login = (email, password) => {
 
         try {
             firebase.auth()
-                .signInWithEmailAndPassword(this.state.email, this.state.password)
+                .signInWithEmailAndPassword(email, password)
                 .then(res => {
-                    this.setState({ userData: JSON.stringify( res.user) });
-                    this.props.navigation.navigate('App')
+                    this._saveUserAsyncStorage(res.user)
+                        .then(_ => {
+                            this.props.navigation.navigate('App')
+                        })
+                        .catch(error => {
+                            console.log(error.message)
+                        });
                 })
                 .catch(error => {
                     alert(error.message);
                 });
 
         } catch (error) {
-            console.log(error.toString())
+            console.log(error.toString());
         }
 
     }
@@ -45,7 +61,7 @@ export default class LoginScreen extends React.Component {
 
                 <TouchableOpacity
                     style={[styles.button, {marginBottom: 30}]}
-                    onPress={() => this.login()}>
+                    onPress={() => this.login(this.state.email, this.state.password)}>
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
 
