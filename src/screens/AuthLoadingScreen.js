@@ -6,19 +6,18 @@ import firebase from "firebase";
 export default class LoginScreen extends React.Component {
     constructor(props){
         super(props);
-
-        this.checkSession()
+        this.checkSession();
     }
 
-    checkSession() {
+    checkSession = () => {
         // Not working
-        const user = firebase.auth().currentUser
+        const user = firebase.auth().currentUser;
+
         if (user) {
             this.props.navigation.navigate('App')
         } else {
             this.props.navigation.navigate('Auth')
         }
-
     }
 
     render(){

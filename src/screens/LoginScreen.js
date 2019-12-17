@@ -8,12 +8,19 @@ export default class LoginScreen extends React.Component {
         super(props);
     }
 
-    async signin() {
+    login = () => {
 
         try {
-            await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
-            this.props.navigation.navigate('App')
-            console.log("Logged in")
+            firebase.auth()
+                .signInWithEmailAndPassword(this.state.email, this.state.password)
+                .then(res => {
+                    this.setState({ userData: JSON.stringify( res.user) });
+                    this.props.navigation.navigate('App')
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+
         } catch (error) {
             console.log(error.toString())
         }
@@ -36,7 +43,7 @@ export default class LoginScreen extends React.Component {
                     password={true}
                     onChangeText={(password) => this.setState({password: password})}/>
 
-                <TouchableOpacity style={[styles.button, {marginBottom: 30}]} onPress={() => this.signin()}>
+                <TouchableOpacity style={[styles.button, {marginBottom: 30}]} onPress={() => this.login()}>
                     <Text style={{color:"white", textAlign: "center", marginVertical: 6}}>Login</Text>
                 </TouchableOpacity>
 
