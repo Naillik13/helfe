@@ -43,12 +43,16 @@ export default class LoginScreen extends React.Component {
                     password={true}
                     onChangeText={(password) => this.setState({password: password})}/>
 
-                <TouchableOpacity style={[styles.button, {marginBottom: 30}]} onPress={() => this.login()}>
-                    <Text style={{color:"white", textAlign: "center", marginVertical: 6}}>Login</Text>
+                <TouchableOpacity
+                    style={[styles.button, {marginBottom: 30}]}
+                    onPress={() => this.login()}>
+                    <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} /*onPress={() => navigate('#')}*/>
-                    <Text style={{color:"white", textAlign: "center", marginVertical: 6}}>Sign Up</Text>
+                <TouchableOpacity
+                    style={styles.button}
+                    /*onPress={() => navigate('#')}*/>
+                    <Text style={styles.buttonText}>Sign Up</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -78,6 +82,11 @@ const styles = StyleSheet.create({
         marginLeft: 100,
         marginRight: 100,
         borderRadius: 25
+    },
+    buttonText: {
+        color:"white",
+        textAlign: "center",
+        marginVertical: 6
     }
 
 });
