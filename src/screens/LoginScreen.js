@@ -50,7 +50,7 @@ export default class LoginScreen extends React.Component {
                  source={require('../../assets/logo.png')}/>
                 <TextInput
                     style={styles.input}
-                    placeholder='Login'
+                    placeholder='Email'
                     onChangeText={(email) => this.setState({email: email})}/>
                 <TextInput
                     style={[styles.input, { marginTop: 30, marginBottom: 75}]}
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         height: 300,
         width: 300,
-        marginTop: 100,
+        marginTop: 80,
         borderRadius: 25
     },
     input: {
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         fontSize: 18
     },
     button: {
-        height: 30,
+        height: 42,
         backgroundColor: '#212580',
         marginLeft: 100,
         marginRight: 100,
@@ -102,7 +102,8 @@ const styles = StyleSheet.create({
     buttonText: {
         color:"white",
         textAlign: "center",
-        marginVertical: 6
+        fontSize: 18,
+        marginVertical: 10
     }
 
 });
