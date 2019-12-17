@@ -18,6 +18,7 @@ firebase.initializeApp({
 
 const LoginStack = createStackNavigator({
     Login: LoginScreen
+    //Signup screen goes here
 });
 
 LoginStack.path = '';

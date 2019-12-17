@@ -19,7 +19,7 @@ export default class LoginScreen extends React.Component {
         }
     }
 
-    login = (email, password) => {
+    _login = (email, password) => {
 
         try {
             firebase.auth()
@@ -61,7 +61,7 @@ export default class LoginScreen extends React.Component {
 
                 <TouchableOpacity
                     style={[styles.button, {marginBottom: 30}]}
-                    onPress={() => this.login(this.state.email, this.state.password)}>
+                    onPress={() => this._login(this.state.email, this.state.password)}>
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
 

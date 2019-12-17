@@ -3,13 +3,13 @@ import {ActivityIndicator, AsyncStorage, StyleSheet, View} from 'react-native'
 import firebase from "firebase";
 
 
-export default class LoginScreen extends React.Component {
+export default class AuthLoadingScreen extends React.Component {
     constructor(props){
         super(props);
-        this.checkSession();
+        this._checkSession();
     }
 
-    checkSession = () => {
+    _checkSession = () => {
         this._retrieveUser()
             .then(res => {
                 if (res) {
