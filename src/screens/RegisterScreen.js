@@ -2,7 +2,7 @@ import React from 'react'
 import {View, TextInput, AsyncStorage, Image, TouchableOpacity, Text, StyleSheet} from 'react-native'
 import firebase from "firebase";
 
-export default class SignInScreen extends React.Component {
+export default class RegisterScreen extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         height: 150,
         width: 150,
-        marginTop: 50,
         marginBottom: 20,
         marginTop: 80,
     },

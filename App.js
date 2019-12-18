@@ -4,7 +4,7 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import AppNavigation from "./navigation/AppNavigation";
 
 import * as firebase from "firebase";
-import SignInScreen from "./src/screens/SignInScreen";
+import RegisterScreen from "./src/screens/RegisterScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import {createStackNavigator} from "react-navigation-stack";
 import AuthLoadingScreen from "./src/screens/AuthLoadingScreen";
@@ -19,7 +19,7 @@ firebase.initializeApp({
 
 const LoginStack = createStackNavigator({
     Login: LoginScreen,
-    SignIn: SignInScreen
+    Register: RegisterScreen
 });
 
 LoginStack.path = '';

@@ -78,9 +78,10 @@ export default class LoginScreen extends React.Component {
 const styles = StyleSheet.create({
     logo: {
         alignSelf: 'center',
-        height: 300,
-        width: 300,
+        height: 250,
+        width: 250,
         marginTop: 80,
+        marginBottom: 75,
         borderRadius: 25
     },
     input: {
