@@ -1,14 +1,17 @@
-import React from 'react';
+import React from "react";
+import { Platform } from "react-native";
+import { createSwitchNavigator } from 'react-navigation';
+
 import {createStackNavigator} from "react-navigation-stack";
-import UserScreen from "../src/screens/UserScreen";
-import TabBarIcon from "../src/components/TabBarIcon";
-import {Platform} from "react-native";
-import MapScreen from "../src/screens/MapScreen";
-import AlarmScreen from "../src/screens/AlarmScreen";
-import MoreScreen from "../src/screens/MoreScreen";
+import UserScreen from "./screens/UserScreen";
+import TabBarIcon from "./components/TabBarIcon";
+import MapScreen from "./screens/MapScreen";
+import AlarmScreen from "./screens/AlarmScreen";
+import MoreScreen from "./screens/MoreScreen";
 import {createBottomTabNavigator} from "react-navigation-tabs";
-import Colors from "../src/constants/Colors";
-import LoginScreen from "../src/screens/LoginScreen";
+import Colors from "./constants/Colors";
+import RegisterScreen from "./screens/RegisterScreen";
+import LoginScreen from "./screens/LoginScreen";
 
 const UserStack = createStackNavigator({
     Profile: UserScreen
@@ -86,7 +89,7 @@ MoreStack.navigationOptions = {
 
 MoreStack.path = '';
 
-export default createBottomTabNavigator(
+export const MainNav = createBottomTabNavigator(
     {
         User: UserStack,
         Alarm: AlarmStack,
@@ -105,4 +108,29 @@ export default createBottomTabNavigator(
         },
         initialRouteName: "User"
     }
-)
+);
+
+export const DefaultNav = createStackNavigator({
+    Login: {
+        screen: LoginScreen,
+    },
+    Register: {
+        screen: RegisterScreen,
+    }
+});
+
+export const createRootNavigator = (isLogin = false) => {
+    return createSwitchNavigator(
+        {
+            Main: {
+                screen: MainNav
+            },
+            Default: {
+                screen: DefaultNav
+            }
+        },
+        {
+            initialRouteName: isLogin ? "Main" : "Default"
+        }
+    );
+};

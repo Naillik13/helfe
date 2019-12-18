@@ -1,6 +1,7 @@
 import React from 'react'
-import {View, TextInput, AsyncStorage, Image, TouchableOpacity, Text, StyleSheet} from 'react-native'
+import {View, TextInput, Image, TouchableOpacity, Text, StyleSheet} from 'react-native'
 import firebase from "firebase";
+import {onLogin} from '../Auth'
 
 export default class RegisterScreen extends React.Component {
     constructor(props){
@@ -10,14 +11,6 @@ export default class RegisterScreen extends React.Component {
             lastName: "",
             email: "",
             password: "",
-        }
-    }
-
-    _saveUserAsyncStorage = async (user) => {
-        try {
-            await AsyncStorage.setItem('@User', JSON.stringify(user));
-        } catch (error) {
-            console.log(error.toString())
         }
     }
 
@@ -32,7 +25,7 @@ export default class RegisterScreen extends React.Component {
                 newUserInstance.set(user);
             }
         });
-    }
+    };
 
     _signIn = (lastName, firstName, email, password) => {
 
@@ -48,15 +41,14 @@ export default class RegisterScreen extends React.Component {
                         email: email
                     };
 
-                    this._saveUserFirebase(newUser);
-
-                    this._saveUserAsyncStorage(res.user)
+                    this._saveUserFirebase(newUser)
                         .then(_ => {
-                            this.props.navigation.navigate('App')
-                        })
-                        .catch(error => {
-                            console.log(error.message)
+                            onLogin(res.user.email)
+                                .then(_ => {
+                                    this.props.navigation.navigate('Main')
+                                })
                         });
+
                 })
                 .catch(error => {
                     alert(error.message);
@@ -66,7 +58,7 @@ export default class RegisterScreen extends React.Component {
             console.log(error.toString());
         }
 
-    }
+    };
 
     render(){
         return(
@@ -108,7 +100,7 @@ export default class RegisterScreen extends React.Component {
 
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => this.props.navigation.navigate('Auth')}>
+                    onPress={() => this.props.navigation.navigate('Login')}>
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
             </View>

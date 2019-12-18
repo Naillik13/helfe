@@ -1,5 +1,5 @@
 import React from "react"
-import {StyleSheet, ActivityIndicator, Text, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 
 export default class AlarmScreen extends React.Component {
     constructor(props){

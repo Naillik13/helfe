@@ -1,33 +1,41 @@
 import React from "react"
 import {StyleSheet, Button, Text, View} from "react-native";
 import firebase from "firebase";
+import {onSignOut} from "../Auth";
 
 export default class UserScreen extends React.Component {
     constructor(props){
         super(props);
     }
 
-    async signup(email, pass) {
-
+    _logout = () => {
         try {
-            await firebase.auth().createUserWithEmailAndPassword(email, pass);
+            firebase.auth()
+                .signOut()
+                .then(_ => {
+                    onSignOut()
+                        .then(_ => {
+                            this.props.navigation.navigate('Default')
+                        })
+                        .catch(error => {
+                            console.log(error.message)
+                        });
+                }).catch(error => {
+                    alert(error.message);
+                });
 
-            console.log("Account created");
-
-            // Navigate to the Home page, the user is auto logged in
 
         } catch (error) {
-            console.log(error.toString())
+            console.log(error.toString());
         }
 
-    }
-
+    };
 
     render(){
         return(
             <View style={styles.container}>
                 <Text>ProfilScreen</Text>
-                <Button  title="New user" onPress={() => this.signup("killian.galea0@orange.fr","Mypass13")}/>
+                <Button  title="Logout" onPress={() => this._logout()}/>
 
             </View>
         );
