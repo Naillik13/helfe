@@ -1,7 +1,5 @@
 import React from 'react'
 import {ActivityIndicator, AsyncStorage, StyleSheet, View} from 'react-native'
-import firebase from "firebase";
-
 
 export default class AuthLoadingScreen extends React.Component {
     constructor(props){
@@ -18,13 +16,12 @@ export default class AuthLoadingScreen extends React.Component {
                     this.props.navigation.navigate('Auth')
                 }
             })
-    }
+    };
 
     _retrieveUser = async () => {
         try {
             const value = await AsyncStorage.getItem('@User');
             if (value !== null) {
-                console.log(value);
                 return value
             }
         } catch (error) {
@@ -51,4 +48,4 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         padding: 10
     }
-})
+});
