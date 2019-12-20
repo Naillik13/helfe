@@ -6,6 +6,7 @@ import * as Location from 'expo-location'
 import * as Permissions from 'expo-permissions'
 import AlertMarker from "../components/AlertMarker";
 import LocationMarker from "../components/LocationMarker";
+import MapViewDirections from "react-native-maps-directions";
 
 
 export default class MapScreen extends React.Component {
@@ -13,8 +14,10 @@ export default class MapScreen extends React.Component {
         super(props);
         this.state = {
             location: null,
+            destination: null,
             errorMessage: "Loading current location...",
-            alerts: []
+            alerts: [],
+            itinerary: []
         };
     }
 
@@ -50,7 +53,7 @@ export default class MapScreen extends React.Component {
                         latitude: 37.7800059,
                         longitude: -122.4223171
                     },
-                    title: 'Alert 1'
+                    user: 'Lucie'
 
                 },
                 {
@@ -59,7 +62,7 @@ export default class MapScreen extends React.Component {
                         latitude: 37.790588,
                         longitude: -122.413391
                     },
-                    title: 'Alert 2'
+                    user: 'Andréa'
 
                 }
             ]
@@ -99,10 +102,25 @@ export default class MapScreen extends React.Component {
                             <Marker
                                 key={alert.id}
                                 coordinate={alert.coords}
-                                title={alert.title}>
+                                title={"Position de " + alert.user}
+                                onPress={() => this.setState({destination: alert})}>
                                 <AlertMarker/>
                             </Marker>
                         ))}
+                        {this.state.destination ?
+                            <MapViewDirections
+                                origin={{
+                                    latitude: this.state.location.coords.latitude,
+                                    longitude: this.state.location.coords.longitude,
+                                }}
+                                destination={{
+                                    latitude: this.state.destination.coords.latitude,
+                                    longitude: this.state.destination.coords.longitude,
+                                }}
+                                apikey={'AIzaSyAq2WMyQYgA4miuBZUkdn6muhlbeWAtRYI'}
+                            />
+                        : null }
+
                     </MapView>
                 </View>
             );
@@ -127,5 +145,5 @@ const styles = StyleSheet.create({
     mapStyle: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
-    },
+    }
 });
