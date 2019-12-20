@@ -1,5 +1,5 @@
 import React from "react"
-import {Platform, StyleSheet, View, Dimensions, Text} from "react-native";
+import {Platform, StyleSheet, TouchableOpacity, View, Text} from "react-native";
 import MapView, {Marker} from 'react-native-maps';
 import Constants from "expo-constants";
 import * as Location from 'expo-location'
@@ -17,7 +17,8 @@ export default class MapScreen extends React.Component {
             destination: null,
             errorMessage: "Loading current location...",
             alerts: [],
-            itinerary: []
+            itinerary: [],
+
         };
     }
 
@@ -75,7 +76,7 @@ export default class MapScreen extends React.Component {
             return (
                 <View style={styles.container}>
                     <MapView
-                        style={styles.mapStyle}
+                        style={styles.map}
                         initialRegion={{
                             latitude: this.state.location.coords.latitude,
                             longitude: this.state.location.coords.longitude,
@@ -122,6 +123,17 @@ export default class MapScreen extends React.Component {
                         : null }
 
                     </MapView>
+                    {this.state.destination ?
+                        <View style={styles.bubbleContainer}>
+                            <View style={styles.bubble}>
+                                <Text>{this.state.destination.user}</Text>
+                                <TouchableOpacity
+                                    style={styles.button}>
+                                    <Text style={styles.buttonText}>Je l'ai aidé !</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    : null}
                 </View>
             );
         } else {
@@ -137,13 +149,37 @@ export default class MapScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#fff',
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        justifyContent: 'center',
     },
-    mapStyle: {
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
+    map: {
+        ...StyleSheet.absoluteFillObject,
+    },
+    bubble: {
+        flex: 1,
+        backgroundColor: 'white',
+        paddingHorizontal: 18,
+        paddingVertical: 12,
+        marginHorizontal: 18,
+        borderRadius: 20,
+    },
+    bubbleContainer: {
+        flexDirection: 'row',
+        marginVertical: 20,
+        backgroundColor: 'transparent',
+    },
+    button: {
+        height: 42,
+        backgroundColor: '#212580',
+        marginLeft: 100,
+        marginRight: 100,
+        borderRadius: 25
+    },
+    buttonText: {
+        color:"white",
+        textAlign: "center",
+        fontSize: 18,
+        marginVertical: 10
     }
 });
