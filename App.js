@@ -1,19 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import App from "./src/Index";
+import * as firebase from "firebase";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+firebase.initializeApp({
+    apiKey: "AIzaSyClvKKxYhr7sx9QoICnOjUQRMLzx1EFkbk",
+    authDomain: "rnfirebase-1d7bf.firebaseapp.com",
+    databaseURL: "https://rnfirebase-1d7bf.firebaseio.com",
+    projectId: "rnfirebase-1d7bf",
+    storageBucket: "rnfirebase-1d7bf.appspot.com",
 });
+
+export default App;
+

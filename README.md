@@ -11,10 +11,10 @@
 ## Visual Identity
 
 **1.** Colors:
-- Light blue: `#b3cdfb`
-- Slightly blue: `#538fff`
-- Blue: `#4350cf`
-- Dark blue: `#212580` 
+- `#b3cdfb`
+- `#538fff`
+- `#4350cf`
+- `#212580` 
 
 **2.** Fonts:
 - Montserrat semi-bold
