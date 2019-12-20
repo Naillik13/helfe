@@ -13,9 +13,15 @@ import Colors from "./constants/Colors";
 import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
 
+const defaultNavigationOptions = {
+    headerStyle: {
+        backgroundColor: Colors.tabBar
+    }
+};
+
 const UserStack = createStackNavigator({
     Profile: UserScreen
-});
+}, { defaultNavigationOptions });
 
 UserStack.navigationOptions = {
     tabBarIcon: ({ focused }) => (
@@ -34,7 +40,7 @@ UserStack.path = '';
 
 const MapStack = createStackNavigator({
     Map: MapScreen
-});
+}, { defaultNavigationOptions });
 
 MapStack.navigationOptions = {
     tabBarIcon: ({ focused }) => (
@@ -53,7 +59,7 @@ MapStack.path = '';
 
 const AlarmStack = createStackNavigator({
     Alarm: AlarmScreen
-});
+}, { defaultNavigationOptions });
 
 AlarmStack.navigationOptions = {
     tabBarIcon: ({ focused }) => (
@@ -72,7 +78,7 @@ AlarmStack.path = '';
 
 const MoreStack = createStackNavigator({
     More: MoreScreen
-});
+}, { defaultNavigationOptions });
 
 MoreStack.navigationOptions = {
     tabBarIcon: ({ focused }) => (
