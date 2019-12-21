@@ -10,7 +10,6 @@ export default class AlarmScreen extends React.Component {
         this.state = {
             emitters    : [],
             users       : [],
-            alert       : []
         }
     }
 
@@ -65,14 +64,29 @@ export default class AlarmScreen extends React.Component {
             emitters    : this.state.emitters.concat([alert]),
             users       : this.state.users.concat([user])
         })
-
         
-        for (const property in this.state.emitters[0]) {
-            emitters = await this.state.emitters[0][property].emitter
-        }
+        // for (const property in this.state.emitters[0]) {
+        //     emitters = await this.state.emitters[0][property].emitter
+        // }
         try {
-            let alert_user = await this.state.users.filter(item => Object.keys(item) === emitters)
-            if (alert_user.length > 0) {
+            var arr
+            this.state.emitters.map(
+                (item_emit, k) => {
+                    arr = Object.values(item_emit)
+
+                    if(this.state.emitters.length < 2) {
+                        arr     = [arr[k].emitter]
+                    } else {
+                        arr     = arr[k].emitter
+                    }
+                }
+            )
+
+            var alert_user = this.state.users.filter(
+                item_user => Object.keys(item_user) == arr
+            )
+
+            if (alert_user.length > 0 && alert_user[0] != undefined) {
                 console.log(alert_user)
             } else {
                 console.log("Array is empty")
