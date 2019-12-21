@@ -8,8 +8,9 @@ export default class AlarmScreen extends React.Component {
         super(props);
 
         this.state = {
-            emitter : [],
-            users   : []
+            emitters    : [],
+            users       : [],
+            alert       : []
         }
     }
 
@@ -22,18 +23,7 @@ export default class AlarmScreen extends React.Component {
             const object_alert = await snapshot.val() 
             
             if (object_alert != undefined && object_alert != null) {
-                for (const property in object_alert) {
-                    try {
-                        if(object_alert[property].emitter != null && object_alert[property].emitter != 0) {
-                            
-                            return object_alert[property];
-                        } else {
-                            console.log("emitter is not ok", e)
-                        }
-                    } catch (e) {
-                        console.error("alerts are not ok", e)
-                    }
-                }
+                return object_alert
             } else {
                 console.log("not alert for the moment")
             }
@@ -53,16 +43,8 @@ export default class AlarmScreen extends React.Component {
         
         try {
             const object_user = await snapshot.val()
-
-            for (const prop in object_user) {
-                try {
-                    return object_user[prop]
-                } catch (e) {
-                    console.error("users are not ok", e)
-                }
-            }
+            return object_user
             
-         
         } catch(err) {
             console.error("connexion error", err)
         } 
@@ -75,20 +57,28 @@ export default class AlarmScreen extends React.Component {
 
        try {
 
+        var emitters
         let alert  = await this._getAlerts()
         let user   = await this._getUsers()
 
-        // ok
-        console.log(alert, user)
+        this.setState({
+            emitters    : this.state.emitters.concat([alert]),
+            users       : this.state.users.concat([user])
+        })
 
-        if (alert.emitter === user.uid) {
-            // not ok > status command is pending 
-            this.setState({
-                emitter : emitter,
-                users   : user
-            }, () => console.log(this.state))
-        } else {
-            console.log("uid are not equal")
+        
+        for (const property in this.state.emitters[0]) {
+            emitters = await this.state.emitters[0][property].emitter
+        }
+        try {
+            let alert_user = await this.state.users.filter(item => Object.keys(item) === emitters)
+            if (alert_user.length > 0) {
+                console.log(alert_user)
+            } else {
+                console.log("Array is empty")
+            }
+        } catch (e) {
+            console.error(e)
         }
         
        } catch (e) {
@@ -107,7 +97,7 @@ export default class AlarmScreen extends React.Component {
                     data={this.state}
                     renderItem={({ item }) => 
                     <GetAlert 
-                        status={item.emitter.status} 
+                        status={item.emitters.status} 
                         firstName={item.users.firstName}
                     />}
                     keyExtractor={item => item.id}
