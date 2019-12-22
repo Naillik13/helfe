@@ -54,50 +54,56 @@ export default class AlarmScreen extends React.Component {
 
     componentDidMount = async () => {
 
-       try {
-
-        var emitters
-        let alert  = await this._getAlerts()
-        let user   = await this._getUsers()
-
-        this.setState({
-            emitters    : this.state.emitters.concat([alert]),
-            users       : this.state.users.concat([user])
-        })
-        
-        // for (const property in this.state.emitters[0]) {
-        //     emitters = await this.state.emitters[0][property].emitter
-        // }
         try {
-            var arr
-            this.state.emitters.map(
-                (item_emit, k) => {
-                    arr = Object.values(item_emit)
 
-                    if(this.state.emitters.length < 2) {
-                        arr     = [arr[k].emitter]
-                    } else {
-                        arr     = arr[k].emitter
-                    }
+            var emitters
+            let alert  = await this._getAlerts()
+            let user   = await this._getUsers()
+
+            if(alert != null && alert != undefined && user != null && user != undefined) {
+
+                this.setState({
+                    emitters    : this.state.emitters.concat([alert]),
+                    users       : this.state.users.concat([user])
+                })
+                
+                try {
+                    var arr
+                    var filter_arr
+                    
+                    this.state.emitters.map(
+                        (item_emit, k) => {
+                            arr = Object.values(item_emit)
+
+                            if(this.state.emitters.length < 2) {
+                                arr     = [arr[k].emitter]
+                            } else {
+                                arr     = arr[k].emitter
+                            }
+                        }
+                    )
+
+
+                    this.state.users.forEach(el => {
+                        filter_arr = Object.keys(el).filter(item => 
+                            arr.toString() === item
+                        )
+                    })
+
+                    console.log(filter_arr)
+
+                } catch (e) {
+                    console.error(e)
                 }
-            )
-
-            var alert_user = this.state.users.filter(
-                item_user => Object.keys(item_user) == arr
-            )
-
-            if (alert_user.length > 0 && alert_user[0] != undefined) {
-                console.log(alert_user)
             } else {
-                console.log("Array is empty")
+                console.log("There is no alert")
             }
+            
         } catch (e) {
-            console.error(e)
+            console.error("cannot get a user with emit uid")
         }
-        
-       } catch (e) {
-           console.error("cannot get a user with emit uid")
-       }
+
+       
 
     }
 
