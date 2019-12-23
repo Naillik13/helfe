@@ -1,7 +1,9 @@
 import React from "react"
 import {StyleSheet, Dimensions, View} from "react-native";
 import firebase from "firebase";
-import SendAlertButton from "../components/alerts/SendAlertButton";
+import SendAlertButton from "../components/Alert/SendAlertButton";
+import SendingConfirmationPopup from "../components/Alert/SendingConfirmationPopup";
+import DisplaySentAlert from "../components/Alert/DisplaySentAlert";
 import * as Permissions from "expo-permissions";
 import * as Location from "expo-location";
 
@@ -9,8 +11,10 @@ export default class AlarmScreen extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            buttonIsDisabled: true,
-            canLaunchAlert: true,
+            alertSentAt: 0,
+            alertSendingDelay: 5,
+            displayPopup: false,
+            canLaunchAlert: false,
         }
     }
 
@@ -42,9 +46,34 @@ export default class AlarmScreen extends React.Component {
         this.setState({ location: location });
     };
 
+    _prepareAlert = () => {
+        if(this.state.canLaunchAlert === true) {
+            // Set display popup to true
+            this.setState({
+                displayPopup: true
+            });
+        }
+    }
+
+    _cancelAlert = () => {
+        this.setState({
+            displayPopup: false,
+            alertSendingDelay: 5,
+        })
+    }
+
+    _skipAlertDelay = () => {
+        this.setState({
+            alertSendingDelay: 0,
+            displayPopup: false
+        }, () => {
+            this._sendAlert()
+        });
+    }
+
     _sendAlert = () => {
 
-        if(this.state.canLaunchAlert === true) {
+        if(this.state.canLaunchAlert === true && this.state.alertSendingDelay == 0) {
 
             // Firebase references
             const rootReference = firebase.database().ref();
@@ -65,7 +94,8 @@ export default class AlarmScreen extends React.Component {
                 alert('Alerte envoyée !');
                 this.setState({
                     buttonIsDisabled: true,
-                    canLaunchAlert: false
+                    canLaunchAlert: false,
+                    alertSentAt: sendingTime
                 });
             }).catch(error => {
                 alert(error.message);
@@ -83,6 +113,7 @@ export default class AlarmScreen extends React.Component {
         let allowAlertSending = true;
         let disableButton = false;
         let userId = user.uid;
+        let alertSendingTime = 0;
         
         // Firebase references
         const database = firebase.database();
@@ -99,32 +130,48 @@ export default class AlarmScreen extends React.Component {
                 // disable the button and the sending of alerts
                 let alertSendStatus = ["started", "open", "confirmed"];
                 let alertAlreadySent = (emitterId === userId && alertSendStatus.includes(alertObject.val().status));
+
+                if(emitterId === userId) {
+                    console.log(alertObject.val().sendAt);
+                    alertSendingTime = alertObject.val().sendAt;
+                }
+
                 allowAlertSending = !alertAlreadySent;
                 disableButton = alertAlreadySent;
             });
 
             this.setState({
                 canLaunchAlert: allowAlertSending,
-                buttonIsDisabled: disableButton
+                buttonIsDisabled: disableButton,
+                sendAt: alertSendingTime
             });
         });
     };
 
     render(){
-        return(
-            <View style={styles.container}>
-                <View style={[styles.circle, styles.firstCircle]}>
-                    <View style={[styles.circle, styles.secondCircle]}>
-                        <View style={[styles.circle, styles.thirdCircle]}>
-                        </View>
-                    </View>
+        
+        if(this.state.canLaunchAlert) {
+            return (                
+                <View style={styles.container}>
+                    <SendAlertButton
+                        countdownDelay={this.state.alertSendingDelay}
+                        displayPopup={this.state.displayPopup}
+                        buttonIsDisabled={this.state.buttonIsDisabled}
+                        cancelFunction={() => this._cancelAlert()}
+                        prepareFunction={() => this._prepareAlert()}
+                        skipFunction={() => this._skipAlertDelay()}
+                        sendFunction={() => this._sendAlert()}>
+                    </SendAlertButton>
                 </View>
-                <SendAlertButton
-                    buttonIsDisabled={this.state.buttonIsDisabled}
-                    alertFunction={() => this._sendAlert()}>
-                </SendAlertButton>
-            </View>
-        );
+            )
+        } else {
+            return (
+                <View style={styles.container}>
+                    <DisplaySentAlert alertSentAt={this.state.alertSentAt}>
+                    </DisplaySentAlert>
+                </View>
+            )
+        }
     }
 
 }
@@ -144,32 +191,5 @@ const styles = StyleSheet.create({
         backgroundColor: "#B3CDFB",
         position: "relative",
         zIndex: -5
-    },
-    circle: {
-        borderRadius: 9999,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#4350cf",
-        position: "absolute",
-    },
-    firstCircle: {
-        width: (viewWidth / 100 * 120),
-        height: (viewHeight / 100 * 65),
-        opacity: 0.5,
-        zIndex: -4
-    },
-    secondCircle: {
-        width: (viewWidth / 100 * 95),
-        height: (viewHeight / 100 * 50),
-        opacity: 0.75,
-        zIndex: -3
-    },
-    thirdCircle: {
-        width: (viewWidth / 100 * 70),
-        height: (viewHeight / 100 * 35),
-        opacity: 1,
-        zIndex: -2
     }
 });
