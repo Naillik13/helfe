@@ -2,6 +2,8 @@ import React from "react"
 import { StyleSheet, Dimensions, View } from "react-native";
 import firebase from "firebase";
 import SendAlertButton from "../components/alerts/SendAlertButton";
+import * as Permissions from "expo-permissions";
+import * as Location from "expo-location";
 
 export default class AlarmScreen extends React.Component {
     constructor(props){
@@ -11,6 +13,18 @@ export default class AlarmScreen extends React.Component {
             canLaunchAlert: true,
         }
     }
+
+    _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.setState({
+                errorMessage: 'Permission to access location was denied',
+            });
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        this.setState({ location: location });
+    };
 
     _sendAlert = () => {
 
@@ -76,6 +90,9 @@ export default class AlarmScreen extends React.Component {
     }
 
     componentDidMount = () => {
+        // Set current location
+        this._getLocationAsync
+
         // Retrieve the current user
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
