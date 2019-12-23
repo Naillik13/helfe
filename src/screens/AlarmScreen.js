@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, Dimensions, View } from "react-native";
+import {StyleSheet, Dimensions, View, Platform} from "react-native";
 import firebase from "firebase";
 import SendAlertButton from "../components/alerts/SendAlertButton";
 import * as Permissions from "expo-permissions";
@@ -12,6 +12,22 @@ export default class AlarmScreen extends React.Component {
             buttonIsDisabled: true,
             canLaunchAlert: true,
         }
+    }
+
+    componentWillMount() {
+        this._getLocationAsync();
+    }
+
+    componentDidMount = () => {
+        // Retrieve the current user
+        firebase.auth().onAuthStateChanged(user => {
+            if(user) {
+                this.setState({
+                    user: user
+                })
+                this._checkAlerts(this.state.user);
+            }
+        });
     }
 
     _getLocationAsync = async () => {
@@ -36,11 +52,15 @@ export default class AlarmScreen extends React.Component {
 
             // UNIX timestamp where alert was send (without milliseconds)
             let sendingTime = Math.floor(new Date().getTime() / 1000);
-
+            console.log(this.state.location)
             alertsReference.push({
                 "emitter": this.state.user.uid,
                 "helpers": null,
                 "status": "started",
+                "location": {
+                    "latitude": this.state.location.coords.latitude,
+                    "longitude": this.state.location.coords.longitude
+                },
                 "sendAt": sendingTime
             }).then(response => {
                 alert('Alerte envoyée !');
@@ -78,29 +98,15 @@ export default class AlarmScreen extends React.Component {
 
                 // If the current user is found as emitter in an alert,
                 // disable the button and the sending of alerts
-                allowAlertSending = (emitterId === userId) ? false : allowAlertSending;
-                disableButton = (emitterId === userId) ? true : disableButton;
+                let alertStatus = ["started", "open", "confirmed"]
+                allowAlertSending = (emitterId === userId && alertStatus.includes(alertObject.val().status)) ? false : allowAlertSending;
+                disableButton = (emitterId === userId && alertStatus.includes(alertObject.val().status)) ? true : disableButton;
             });
 
             this.setState({
                 canLaunchAlert: allowAlertSending,
                 buttonIsDisabled: disableButton
             });
-        });
-    }
-
-    componentDidMount = () => {
-        // Set current location
-        this._getLocationAsync
-
-        // Retrieve the current user
-        firebase.auth().onAuthStateChanged(user => {
-            if(user) {
-                this.setState({
-                    user: user
-                })
-                this._checkAlerts(this.state.user);
-            }
         });
     }
 
