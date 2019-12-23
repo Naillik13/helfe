@@ -1,5 +1,5 @@
 import React from "react"
-import {StyleSheet, Dimensions, View, Platform} from "react-native";
+import {StyleSheet, Dimensions, View} from "react-native";
 import firebase from "firebase";
 import SendAlertButton from "../components/alerts/SendAlertButton";
 import * as Permissions from "expo-permissions";
@@ -24,11 +24,11 @@ export default class AlarmScreen extends React.Component {
             if(user) {
                 this.setState({
                     user: user
-                })
+                });
                 this._checkAlerts(this.state.user);
             }
         });
-    }
+    };
 
     _getLocationAsync = async () => {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -52,7 +52,6 @@ export default class AlarmScreen extends React.Component {
 
             // UNIX timestamp where alert was send (without milliseconds)
             let sendingTime = Math.floor(new Date().getTime() / 1000);
-            console.log(this.state.location)
             alertsReference.push({
                 "emitter": this.state.user.uid,
                 "helpers": null,
@@ -62,7 +61,7 @@ export default class AlarmScreen extends React.Component {
                     "longitude": this.state.location.coords.longitude
                 },
                 "sendAt": sendingTime
-            }).then(response => {
+            }).then(_ => {
                 alert('Alerte envoyée !');
                 this.setState({
                     buttonIsDisabled: true,
@@ -75,7 +74,7 @@ export default class AlarmScreen extends React.Component {
         } else {
             alert('Vous ne pouvez pas envoyez plusieurs alertes à la fois.');
         }
-    }
+    };
 
     _checkAlerts = (user) => {
        
@@ -94,13 +93,14 @@ export default class AlarmScreen extends React.Component {
             // When values are found in alerts table,
             // loop through each alert
             alerts.forEach((alertObject) => {
-                var emitterId = alertObject.val().emitter;
+                let emitterId = alertObject.val().emitter;
 
                 // If the current user is found as emitter in an alert,
                 // disable the button and the sending of alerts
-                let alertStatus = ["started", "open", "confirmed"]
-                allowAlertSending = (emitterId === userId && alertStatus.includes(alertObject.val().status)) ? false : allowAlertSending;
-                disableButton = (emitterId === userId && alertStatus.includes(alertObject.val().status)) ? true : disableButton;
+                let alertSendStatus = ["started", "open", "confirmed"];
+                let alertAlreadySent = (emitterId === userId && alertSendStatus.includes(alertObject.val().status));
+                allowAlertSending = !alertAlreadySent;
+                disableButton = alertAlreadySent;
             });
 
             this.setState({
@@ -108,7 +108,7 @@ export default class AlarmScreen extends React.Component {
                 buttonIsDisabled: disableButton
             });
         });
-    }
+    };
 
     render(){
         return(
