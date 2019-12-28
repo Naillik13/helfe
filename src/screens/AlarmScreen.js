@@ -1,15 +1,14 @@
 import React from "react"
 import {StyleSheet, Text, FlatList, SafeAreaView} from "react-native";
 import firebase from "firebase";
-// import GetAlert from "./Alert/GetAlert";
+import GetAlert from "./Alert/GetAlert";
 
 export default class AlarmScreen extends React.Component {
     constructor(props){
         super(props);
 
         this.state = {
-            emitters    : [],
-            users       : [],
+            alerts : []
         }
     }
 
@@ -19,8 +18,8 @@ export default class AlarmScreen extends React.Component {
         let snapshot = await db.ref('alerts').once('value')
 
         try {
-            const object_alert = await snapshot.val() 
-            
+            const object_alert = await snapshot.val()
+
             if (object_alert != undefined && object_alert != null) {
                 return object_alert
             } else {
@@ -30,8 +29,8 @@ export default class AlarmScreen extends React.Component {
 
         } catch (err) {
             console.error("connexion error", err)
-        } 
-            
+        }
+
 
     }
 
@@ -39,14 +38,14 @@ export default class AlarmScreen extends React.Component {
 
         // get users
         let snapshot = await db.ref('users').once('value')
-        
+
         try {
             const object_user = await snapshot.val()
             return object_user
-            
+
         } catch(err) {
             console.error("connexion error", err)
-        } 
+        }
 
 
     }
@@ -54,56 +53,62 @@ export default class AlarmScreen extends React.Component {
 
     componentDidMount = async () => {
 
-        try {
+        // Get all alerts and users (Object)
+        var alerts              = await this._getAlerts()
+        var users               = await this._getUsers()
 
-            var emitters
-            let alert  = await this._getAlerts()
-            let user   = await this._getUsers()
+        // Set Array
+        var emit_array          = []
+        var users_array         = []
+        var users_with_alerts   = []
+        var alerts_array        = []
+        var new_object          = {}
 
-            if(alert != null && alert != undefined && user != null && user != undefined) {
-
-                this.setState({
-                    emitters    : this.state.emitters.concat([alert]),
-                    users       : this.state.users.concat([user])
-                })
-                
-                try {
-                    var arr
-                    var filter_arr
-                    
-                    this.state.emitters.map(
-                        (item_emit, k) => {
-                            arr = Object.values(item_emit)
-
-                            if(this.state.emitters.length < 2) {
-                                arr     = [arr[k].emitter]
-                            } else {
-                                arr     = arr[k].emitter
-                            }
-                        }
-                    )
-
-
-                    this.state.users.forEach(el => {
-                        filter_arr = Object.keys(el).filter(item => 
-                            arr.toString() === item
-                        )
-                    })
-
-                    console.log(filter_arr)
-
-                } catch (e) {
-                    console.error(e)
-                }
-            } else {
-                console.log("There is no alert")
-            }
-            
-        } catch (e) {
-            console.error("cannot get a user with emit uid")
+        // Get alerts with array
+        for (let values of Object.values(alerts)) {
+            emit_array.push(values)
         }
 
-       
+        // Get users with array
+        for (let val of Object.values(users)) {
+            users_array.push(val)
+        }
+
+        // Get users with alerts
+        emit_array.map(emit => {
+            let new_users = users_array.filter(user => user.uid === emit.emitter)
+            if (new_users.length > 0) {
+                users_with_alerts.push(new_users)
+            }
+        })
+
+        // Get alerts with users
+        users_array.map(user => {
+            let new_alerts = emit_array.filter(emit => emit.emitter === user.uid)
+            if( new_alerts.length > 0) {
+                alerts_array.push(new_alerts)
+            }
+        })
+
+        // Get Status
+        alerts_array.map(alert => {
+            // Set state if not empty
+            Object.assign(new_object, {status: alert[0].status});
+        })
+
+        // Get First Name
+        users_with_alerts.map(user => {
+            // Set state if not empty
+            Object.assign(new_object, {
+                id:        user[0].uid,
+                firstName: user[0].firstName
+            });
+        })
+
+        // GET ALERT AND USER IN ONLY ONE STATE
+        this.setState({
+            alerts: this.state.alerts.concat(new_object)
+        })
 
     }
 
@@ -111,17 +116,15 @@ export default class AlarmScreen extends React.Component {
         return(
             <SafeAreaView style={styles.container}>
                 <Text>AlarmScreen</Text>
-
-                {/* get alerts sended -> components /Alert/GetAlert.js */}
-                {/* <FlatList
-                    data={this.state}
-                    renderItem={({ item }) => 
-                    <GetAlert 
-                        status={item.emitters.status} 
-                        firstName={item.users.firstName}
+                <FlatList
+                    data={this.state.alerts}
+                    renderItem={({ item }) =>
+                    <GetAlert
+                        status={item.status}
+                        firstName={item.firstName}
                     />}
                     keyExtractor={item => item.id}
-                /> */}
+                />
             </SafeAreaView>
         );
     }

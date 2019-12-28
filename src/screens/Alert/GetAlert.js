@@ -9,10 +9,10 @@ export default class GetAlert extends React.Component {
     render(){
         return (
             <View>
-                {/* emit */}
-                <Text>{this.props.status} est en danger !!</Text>
                 {/* status */}
-                <Text>{this.props.firstName} est en danger !!</Text>
+                <Text>{this.props.status}</Text>
+                {/* first name */}
+                <Text>{this.props.firstName}</Text>
             </View>
         );
     }
