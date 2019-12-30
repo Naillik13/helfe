@@ -1,5 +1,5 @@
 import React from "react"
-import {FlatList, SafeAreaView, StyleSheet, Text} from "react-native";
+import {FlatList, View, StyleSheet} from "react-native";
 import firebase from "firebase";
 import HeaderIcon from "../components/HeaderIcon";
 import GetAlert from "../components/Alert/GetAlert";
@@ -103,7 +103,10 @@ export default class AlertListScreen extends React.Component {
         // Get Status
         alerts_array.map(alert => {
             // Set state if not empty
-            Object.assign(new_object, {status: alert[0].status});
+            let interval  = new Date().getTime() - new Date(alert[0].sendAt * 1000).getTime();
+            interval = Math.round(((interval % 86400000) % 3600000) / 60000);
+
+            Object.assign(new_object, {status: alert[0].status, interval: interval});
         });
 
         // Get First Name
@@ -124,27 +127,19 @@ export default class AlertListScreen extends React.Component {
 
     render(){
         return(
-            <SafeAreaView style={styles.container}>
-                <Text>AlarmScreen</Text>
+            <View>
                 <FlatList
                     data={this.state.alerts}
                     renderItem={({ item }) =>
-                    <GetAlert
-                        status={item.status}
-                        firstName={item.firstName}
-                    />}
+                        <GetAlert
+                            status={item.status}
+                            firstName={item.firstName}
+                            interval={item.interval}
+                        />
+                    }
                     keyExtractor={item => item.id}
                 />
-            </SafeAreaView>
+            </View>
         );
     }
-
 }
-
-const styles = StyleSheet.create({
-    container: {
-        marginLeft: 20,
-        marginRight: 20,
-        marginBottom: 20
-    }
-});
