@@ -9,12 +9,12 @@ export default function DisplaySentAlert(props) {
             let formatDate = new Date(date * 1000);
             const hours = formatDate.getHours();
             const minutes = "0" + formatDate.getMinutes();
-            return hours + ':' + minutes.substr(-2);
+            return hours + "h" + minutes.substr(-2);
         }
     }
     
     return (
-        <View>
+        <View style={styles.container}>
             <Text>Alerte envoyée à {this._readAlertSentDate(props.alertSentAt)}</Text>
         </View>
     )

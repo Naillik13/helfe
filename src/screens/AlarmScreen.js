@@ -130,11 +130,7 @@ export default class AlarmScreen extends React.Component {
                 // disable the button and the sending of alerts
                 let alertSendStatus = ["started", "open", "confirmed"];
                 let alertAlreadySent = (emitterId === userId && alertSendStatus.includes(alertObject.val().status));
-
-                if(emitterId === userId) {
-                    console.log(alertObject.val().sendAt);
-                    alertSendingTime = alertObject.val().sendAt;
-                }
+                if(emitterId === userId) alertSendingTime = alertObject.val().sendAt;
 
                 allowAlertSending = !alertAlreadySent;
                 disableButton = alertAlreadySent;
@@ -143,7 +139,7 @@ export default class AlarmScreen extends React.Component {
             this.setState({
                 canLaunchAlert: allowAlertSending,
                 buttonIsDisabled: disableButton,
-                sendAt: alertSendingTime
+                alertSentAt: alertSendingTime
             });
         });
     };
@@ -152,7 +148,7 @@ export default class AlarmScreen extends React.Component {
         
         if(this.state.canLaunchAlert) {
             return (                
-                <View style={styles.container}>
+                <View style={[styles.container, styles.containerButton]}>
                     <SendAlertButton
                         countdownDelay={this.state.alertSendingDelay}
                         displayPopup={this.state.displayPopup}
@@ -166,7 +162,7 @@ export default class AlarmScreen extends React.Component {
             )
         } else {
             return (
-                <View style={styles.container}>
+                <View style={[styles.container, styles.containerSentAlert]}>
                     <DisplaySentAlert alertSentAt={this.state.alertSentAt}>
                     </DisplaySentAlert>
                 </View>
@@ -188,8 +184,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexGrow: 1,
-        backgroundColor: "#B3CDFB",
         position: "relative",
         zIndex: -5
+    },
+    containerButton: {
+        backgroundColor: "#B3CDFB",
+    },
+    containerSentAlert: {
+        backgroundColor: "#FFFFFF",
     }
 });
