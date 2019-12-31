@@ -62,6 +62,39 @@ export default class AlarmScreen extends React.Component {
         })
     }
 
+    _closeAlert = (alertId) => {
+
+        // Firebase references
+        const database = firebase.database();
+
+        // Single alert reference
+        const alertReference = database.ref("alerts/" + alertId);
+
+        // Check if the alert is found first, then update it
+        if(alertReference !== false || typeof(alertReference) === "undefined") {
+
+            // Update the status
+            alertReference.update({
+                status: "closed"
+            }).then( 
+                () => {
+                    alertReference.once('value', (alertObject) => {
+                        if(alertObject.val().status === "closed") {
+                            alert("Vous êtes désormais considéré comme étant en sécurité.");
+                        }
+                    });
+                }
+            );
+        } else {
+            alert("Il semblerait que votre alerte soit introuvable. Veuillez réessayer.");
+        }
+
+        // Hide the confirmation popup
+        this.setState({
+            displayPopup: false
+        });
+    }
+
     _skipAlertDelay = () => {
         this.setState({
             alertSendingDelay: 0,
@@ -73,7 +106,7 @@ export default class AlarmScreen extends React.Component {
 
     _sendAlert = () => {
 
-        if(this.state.canLaunchAlert === true && this.state.alertSendingDelay == 0) {
+        if(this.state.canLaunchAlert === true) {
 
             // Firebase references
             const rootReference = firebase.database().ref();
@@ -90,19 +123,17 @@ export default class AlarmScreen extends React.Component {
                     "longitude": this.state.location.coords.longitude
                 },
                 "sendAt": sendingTime
-            }).then(_ => {
-                alert('Alerte envoyée !');
+            }).then((alertObject) => {
                 this.setState({
                     buttonIsDisabled: true,
                     canLaunchAlert: false,
-                    alertSentAt: sendingTime
+                    alertSentAt: sendingTime,
+                    alertId: alertObject.key
                 });
             }).catch(error => {
                 alert(error.message);
             });
 
-        } else {
-            alert('Vous ne pouvez pas envoyez plusieurs alertes à la fois.');
         }
     };
 
@@ -111,8 +142,8 @@ export default class AlarmScreen extends React.Component {
         // Check if alert is already launched by current user
         // Set to true by default
         let allowAlertSending = true;
-        let disableButton = false;
         let userId = user.uid;
+        let alertId = 0;
         let alertSendingTime = 0;
         
         // Firebase references
@@ -125,21 +156,23 @@ export default class AlarmScreen extends React.Component {
             // loop through each alert
             alerts.forEach((alertObject) => {
                 let emitterId = alertObject.val().emitter;
+                let alertSentStatus = ["started", "open", "confirmed"];
 
-                // If the current user is found as emitter in an alert,
-                // disable the button and the sending of alerts
-                let alertSendStatus = ["started", "open", "confirmed"];
-                let alertAlreadySent = (emitterId === userId && alertSendStatus.includes(alertObject.val().status));
-                if(emitterId === userId) alertSendingTime = alertObject.val().sendAt;
-
-                allowAlertSending = !alertAlreadySent;
-                disableButton = alertAlreadySent;
+                // If the current user is found as emitter of an alert,
+                // disable the sending of alerts and retrieve the sent alert details
+                if(emitterId === userId) {
+                    allowAlertSending = (alertSentStatus.includes(alertObject.val().status)) ? false : true;
+                    alertSendingTime = alertObject.val().sendAt;
+                    alertId = alertObject.key;
+                };
             });
 
+            // Update the state
             this.setState({
                 canLaunchAlert: allowAlertSending,
-                buttonIsDisabled: disableButton,
-                alertSentAt: alertSendingTime
+                alertSendingDelay: 5, // Reset the countdown
+                alertSentAt: alertSendingTime,
+                alertId: alertId
             });
         });
     };
@@ -152,7 +185,6 @@ export default class AlarmScreen extends React.Component {
                     <SendAlertButton
                         countdownDelay={this.state.alertSendingDelay}
                         displayPopup={this.state.displayPopup}
-                        buttonIsDisabled={this.state.buttonIsDisabled}
                         cancelFunction={() => this._cancelAlert()}
                         prepareFunction={() => this._prepareAlert()}
                         skipFunction={() => this._skipAlertDelay()}
@@ -163,7 +195,10 @@ export default class AlarmScreen extends React.Component {
         } else {
             return (
                 <View style={[styles.container, styles.containerSentAlert]}>
-                    <DisplaySentAlert alertSentAt={this.state.alertSentAt}>
+                    <DisplaySentAlert
+                        emitter={this.state.user}
+                        alertSentAt={this.state.alertSentAt}
+                        closeFunction={() => this._closeAlert(this.state.alertId)}>
                     </DisplaySentAlert>
                 </View>
             )

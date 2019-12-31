@@ -19,7 +19,7 @@ export default function SendingConfirmationPopup(props) {
                     color={Colors.tintColor}
                     bgColor="#fff"
                     textStyle={{ fontSize: 20 }}
-                    onTimeElapsed={() => alert('OK !')}
+                    onTimeElapsed={props.sendFunction}
                 ></CountdownCircle>
 
                 <View style={styles.popupButtons}>

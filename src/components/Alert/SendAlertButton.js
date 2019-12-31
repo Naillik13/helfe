@@ -11,6 +11,7 @@ export default function SendAlertButton(props) {
                 <SendingConfirmationPopup
                     cancelFunction={props.cancelFunction}
                     skipFunction={props.skipFunction}
+                    sendFunction={props.sendFunction}
                     countdownDelay={props.countdownDelay}>
                 </SendingConfirmationPopup> 
             }
@@ -23,7 +24,6 @@ export default function SendAlertButton(props) {
             </View>
             <TouchableOpacity
                 title="Envoi d'alerte"
-                disabled={props.buttonIsDisabled}
                 onPress={props.prepareFunction}
                 style={[styles.alert, (props.buttonIsDisabled ? styles.alertDisabled : styles.alertEnabled)]}>
                 <Image
