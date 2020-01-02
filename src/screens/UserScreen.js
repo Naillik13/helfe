@@ -2,11 +2,22 @@ import React from "react"
 import {StyleSheet, Button, Text, View} from "react-native";
 import firebase from "firebase";
 import {onSignOut} from "../Auth";
+import HeaderIcon from "../components/HeaderIcon";
+import Colors from "../constants/Colors";
 
 export default class UserScreen extends React.Component {
     constructor(props){
         super(props);
     }
+
+    static navigationOptions = ({ navigation }) => ({
+        headerRight: (
+            <HeaderIcon
+                navigation={navigation}
+            />
+        ),
+        headerTintColor: Colors.tintColor
+    });
 
     _logout = () => {
         try {

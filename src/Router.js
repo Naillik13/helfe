@@ -12,6 +12,7 @@ import {createBottomTabNavigator} from "react-navigation-tabs";
 import Colors from "./constants/Colors";
 import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
+import AlertListScreen from "./screens/AlertListScreen";
 
 const defaultNavigationOptions = {
     headerStyle: {
@@ -20,7 +21,8 @@ const defaultNavigationOptions = {
 };
 
 const UserStack = createStackNavigator({
-    Profile: UserScreen
+    Profile: UserScreen,
+    AlertList: AlertListScreen
 }, { defaultNavigationOptions });
 
 UserStack.navigationOptions = {
@@ -39,7 +41,8 @@ UserStack.navigationOptions = {
 UserStack.path = '';
 
 const MapStack = createStackNavigator({
-    Map: MapScreen
+    Map: MapScreen,
+    AlertList: AlertListScreen
 }, { defaultNavigationOptions });
 
 MapStack.navigationOptions = {
@@ -58,7 +61,8 @@ MapStack.navigationOptions = {
 MapStack.path = '';
 
 const AlarmStack = createStackNavigator({
-    Alarm: AlarmScreen
+    Alarm: AlarmScreen,
+    AlertList: AlertListScreen
 }, { defaultNavigationOptions });
 
 AlarmStack.navigationOptions = {
@@ -77,7 +81,8 @@ AlarmStack.navigationOptions = {
 AlarmStack.path = '';
 
 const MoreStack = createStackNavigator({
-    More: MoreScreen
+    More: MoreScreen,
+    AlertList: AlertListScreen
 }, { defaultNavigationOptions });
 
 MoreStack.navigationOptions = {
@@ -100,7 +105,7 @@ export const MainNav = createBottomTabNavigator(
         User: UserStack,
         Alarm: AlarmStack,
         Map: MapStack,
-        More: MoreStack,
+        More: MoreStack
     },
     {
         tabBarOptions: {
