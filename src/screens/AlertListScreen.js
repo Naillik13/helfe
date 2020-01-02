@@ -1,9 +1,8 @@
 import React from "react"
-import {StyleSheet, Text, FlatList, SafeAreaView} from "react-native";
+import {FlatList, View, StyleSheet} from "react-native";
 import firebase from "firebase";
 import HeaderIcon from "../components/HeaderIcon";
 import GetAlert from "../components/Alert/GetAlert";
-// import Colors from "../constants/Colors";
 
 export default class AlertListScreen extends React.Component {
     constructor(props){
@@ -28,12 +27,12 @@ export default class AlertListScreen extends React.Component {
     _getAlerts = async (db = firebase.database()) => {
 
         // get alerts
-        let snapshot = await db.ref('alerts').once('value')
+        let snapshot = await db.ref('alerts').once('value');
 
         try {
-            const object_alert = await snapshot.val()
+            const object_alert = await snapshot.val();
 
-            if (object_alert != undefined && object_alert != null) {
+            if (object_alert !== undefined && object_alert != null) {
                 return object_alert
             } else {
                 console.log("not alert for the moment")
@@ -45,36 +44,35 @@ export default class AlertListScreen extends React.Component {
         }
 
 
-    }
+    };
 
     _getUsers = async (db = firebase.database()) => {
 
         // get users
-        let snapshot = await db.ref('users').once('value')
+        let snapshot = await db.ref('users').once('value');
 
         try {
-            const object_user = await snapshot.val()
-            return object_user
+            return await snapshot.val();
 
         } catch(err) {
             console.error("connexion error", err)
         }
 
 
-    }
+    };
 
     componentDidMount = async () => {
 
         // Get all alerts and users (Object)
-        var alerts              = await this._getAlerts()
-        var users               = await this._getUsers()
+        let alerts              = await this._getAlerts();
+        let users               = await this._getUsers();
 
         // Set Array
-        var emit_array          = []
-        var users_array         = []
-        var users_with_alerts   = []
-        var alerts_array        = []
-        var new_object          = {}
+        let emit_array          = [];
+        let users_array         = [];
+        let users_with_alerts   = [];
+        let alerts_array        = [];
+        let new_object          = {};
 
         // Get alerts with array
         for (let values of Object.values(alerts)) {
@@ -88,25 +86,28 @@ export default class AlertListScreen extends React.Component {
 
         // Get users with alerts
         emit_array.map(emit => {
-            let new_users = users_array.filter(user => user.uid === emit.emitter)
+            let new_users = users_array.filter(user => user.uid === emit.emitter);
             if (new_users.length > 0) {
                 users_with_alerts.push(new_users)
             }
-        })
+        });
 
         // Get alerts with users
         users_array.map(user => {
-            let new_alerts = emit_array.filter(emit => emit.emitter === user.uid)
+            let new_alerts = emit_array.filter(emit => emit.emitter === user.uid);
             if( new_alerts.length > 0) {
                 alerts_array.push(new_alerts)
             }
-        })
+        });
 
         // Get Status
         alerts_array.map(alert => {
             // Set state if not empty
-            Object.assign(new_object, {status: alert[0].status});
-        })
+            let interval  = new Date().getTime() - new Date(alert[0].sendAt * 1000).getTime();
+            interval = Math.round(((interval % 86400000) % 3600000) / 60000);
+
+            Object.assign(new_object, {status: alert[0].status, interval: interval});
+        });
 
         // Get First Name
         users_with_alerts.map(user => {
@@ -115,38 +116,30 @@ export default class AlertListScreen extends React.Component {
                 id:        user[0].uid,
                 firstName: user[0].firstName
             });
-        })
+        });
 
         // GET ALERT AND USER IN ONLY ONE STATE
         this.setState({
             alerts: this.state.alerts.concat(new_object)
-        })
+        });
 
-    }
+    };
 
     render(){
         return(
-            <SafeAreaView style={styles.container}>
-                <Text>AlarmScreen</Text>
+            <View>
                 <FlatList
                     data={this.state.alerts}
                     renderItem={({ item }) =>
-                    <GetAlert
-                        status={item.status}
-                        firstName={item.firstName}
-                    />}
+                        <GetAlert
+                            status={item.status}
+                            firstName={item.firstName}
+                            interval={item.interval}
+                        />
+                    }
                     keyExtractor={item => item.id}
                 />
-            </SafeAreaView>
+            </View>
         );
     }
-
 }
-
-const styles = StyleSheet.create({
-    container: {
-        marginLeft: 20,
-        marginRight: 20,
-        marginBottom: 20
-    }
-});
