@@ -2,8 +2,8 @@ import React from "react"
 import {StyleSheet, Text, FlatList, SafeAreaView} from "react-native";
 import firebase from "firebase";
 import HeaderIcon from "../components/HeaderIcon";
-import Colors from "../constants/Colors";
-import GetAlert from "./Alert/GetAlert";
+import GetAlert from "../components/Alert/GetAlert";
+// import Colors from "../constants/Colors";
 
 export default class AlertListScreen extends React.Component {
     constructor(props){
