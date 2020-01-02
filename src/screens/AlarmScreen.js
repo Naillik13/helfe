@@ -1,11 +1,12 @@
 import React from "react"
-import {StyleSheet, Dimensions, View} from "react-native";
 import firebase from "firebase";
 import SendAlertButton from "../components/Alert/SendAlertButton";
-import SendingConfirmationPopup from "../components/Alert/SendingConfirmationPopup";
 import DisplaySentAlert from "../components/Alert/DisplaySentAlert";
 import * as Permissions from "expo-permissions";
 import * as Location from "expo-location";
+import {StyleSheet, Dimensions, View} from "react-native";
+import HeaderIcon from "../components/HeaderIcon";
+import Colors from "../constants/Colors";
 
 export default class AlarmScreen extends React.Component {
     constructor(props){
@@ -76,7 +77,7 @@ export default class AlarmScreen extends React.Component {
             // Update the status
             alertReference.update({
                 status: "closed"
-            }).then( 
+            }).then(
                 () => {
                     alertReference.once('value', (alertObject) => {
                         if(alertObject.val().status === "closed") {
@@ -138,14 +139,14 @@ export default class AlarmScreen extends React.Component {
     };
 
     _checkAlerts = (user) => {
-       
+
         // Check if alert is already launched by current user
         // Set to true by default
         let allowAlertSending = true;
         let userId = user.uid;
         let alertId = 0;
         let alertSendingTime = 0;
-        
+
         // Firebase references
         const database = firebase.database();
         const alertsReference = database.ref("alerts");
@@ -177,10 +178,19 @@ export default class AlarmScreen extends React.Component {
         });
     };
 
+    static navigationOptions = ({ navigation }) => ({
+        headerRight: (
+            <HeaderIcon
+                navigation={navigation}
+            />
+        ),
+        headerTintColor: Colors.tintColor
+    });
+
     render(){
-        
+
         if(this.state.canLaunchAlert) {
-            return (                
+            return (
                 <View style={[styles.container, styles.containerButton]}>
                     <SendAlertButton
                         countdownDelay={this.state.alertSendingDelay}
