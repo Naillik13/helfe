@@ -24,6 +24,7 @@ export default class GetAlert extends React.Component {
                     />
                     <View style={{marginLeft: 20}}>
                         <Text>{this.props.firstName} a besoin d'aide !</Text>
+                        <Text>{this.props.status}</Text>
                         <Text  style={{color: 'grey',}}>Il y a {this.props.interval} minutes</Text>
                     </View>
                 </View>

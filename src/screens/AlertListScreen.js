@@ -1,5 +1,5 @@
 import React from "react"
-import {FlatList, View, StyleSheet} from "react-native";
+import {FlatList, View, StyleSheet, Text} from "react-native";
 import firebase from "firebase";
 import HeaderIcon from "../components/HeaderIcon";
 import GetAlert from "../components/Alert/GetAlert";
@@ -106,7 +106,12 @@ export default class AlertListScreen extends React.Component {
             let interval  = new Date().getTime() - new Date(alert[0].sendAt * 1000).getTime();
             interval = Math.round(((interval % 86400000) % 3600000) / 60000);
 
-            Object.assign(new_object, {status: alert[0].status, interval: interval});
+            let is_started = alert.filter(item => item.status !== "closed")
+
+
+            Object.assign(new_object, {status: is_started[0].status, interval: interval});
+
+
         });
 
         // Get First Name
@@ -118,6 +123,7 @@ export default class AlertListScreen extends React.Component {
             });
         });
 
+
         // GET ALERT AND USER IN ONLY ONE STATE
         this.setState({
             alerts: this.state.alerts.concat(new_object)
@@ -126,19 +132,25 @@ export default class AlertListScreen extends React.Component {
     };
 
     render(){
+        // "started", "open", "confirmed"
+        let alerts = this.state.alerts.filter(alert => {
+            return alert.status !== "closed"
+        })
+
+        let flatList = <FlatList
+                            data={alerts}
+                            renderItem={({ item }) =>
+                                <GetAlert
+                                    status={item.status}
+                                    firstName={item.firstName}
+                                    interval={item.interval}
+                                />
+                            }
+                            keyExtractor={item => item.id}
+                        />
         return(
             <View>
-                <FlatList
-                    data={this.state.alerts}
-                    renderItem={({ item }) =>
-                        <GetAlert
-                            status={item.status}
-                            firstName={item.firstName}
-                            interval={item.interval}
-                        />
-                    }
-                    keyExtractor={item => item.id}
-                />
+                {alerts.length > 0 ? flatList : <Text>There are no alerts</Text>}
             </View>
         );
     }
