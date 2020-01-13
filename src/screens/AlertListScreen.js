@@ -1,5 +1,5 @@
 import React from "react"
-import {FlatList, View, StyleSheet} from "react-native";
+import {FlatList, View, StyleSheet, Text} from "react-native";
 import firebase from "firebase";
 import HeaderIcon from "../components/HeaderIcon";
 import GetAlert from "../components/Alert/GetAlert";
@@ -101,44 +101,68 @@ export default class AlertListScreen extends React.Component {
         });
 
         // Get Status
+        var is_started
+        var new_arr = []
         alerts_array.map(alert => {
             // Set state if not empty
             let interval  = new Date().getTime() - new Date(alert[0].sendAt * 1000).getTime();
             interval = Math.round(((interval % 86400000) % 3600000) / 60000);
 
-            Object.assign(new_object, {status: alert[0].status, interval: interval});
+            is_started = alert.filter(item => item.status !== "closed")
+            new_arr.push(is_started)
+
+            Object.assign(new_object, {status: is_started[0].status, interval: interval});
+
         });
 
         // Get First Name
-        users_with_alerts.map(user => {
-            // Set state if not empty
-            Object.assign(new_object, {
-                id:        user[0].uid,
-                firstName: user[0].firstName
-            });
+        var new_alerts_array = []
+        new_arr.map((item, i) => {
+
+            try {
+                var user_filter = users_with_alerts.find(user => item[0].emitter === user[0].uid)
+
+                // Set state if not empty
+                let new_obj = new Object();
+                new_obj.id          = user_filter[0].uid
+                new_obj.firstName   = user_filter[0].firstName
+                new_obj.interval    = new_object.interval
+                new_obj.statis      = new_object.status
+
+                new_alerts_array.push(new_obj);
+            } catch (e) {
+                console.error(e)
+            }
+
         });
 
         // GET ALERT AND USER IN ONLY ONE STATE
         this.setState({
-            alerts: this.state.alerts.concat(new_object)
+            alerts: this.state.alerts.concat(new_alerts_array)
         });
 
     };
 
     render(){
+        // "started", "open", "confirmed"
+        let alerts = this.state.alerts.filter(alert => {
+            return alert.status !== "closed"
+        })
+
+        let flatList = <FlatList
+                            data={alerts}
+                            renderItem={({ item }) =>
+                                <GetAlert
+                                    status={item.status}
+                                    firstName={item.firstName}
+                                    interval={item.interval}
+                                />
+                            }
+                            keyExtractor={item => item.id}
+                        />
         return(
             <View>
-                <FlatList
-                    data={this.state.alerts}
-                    renderItem={({ item }) =>
-                        <GetAlert
-                            status={item.status}
-                            firstName={item.firstName}
-                            interval={item.interval}
-                        />
-                    }
-                    keyExtractor={item => item.id}
-                />
+                {alerts.length > 0 ? flatList  : <Text>There are no alerts</Text>}
             </View>
         );
     }
