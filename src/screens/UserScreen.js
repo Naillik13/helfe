@@ -1,13 +1,30 @@
 import React from "react"
-import {StyleSheet, Button, Text, View, Image, TouchableOpacity} from "react-native";
+import {
+    TextInput,
+    ScrollView,
+    StyleSheet,
+    Button,
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+    ActivityIndicator,
+    Platform
+} from "react-native";
 import firebase from "firebase";
+import Colors from "../constants/Colors";
 import {onSignOut} from "../Auth";
+import Icon from "../components/Icon";
 
 export default class UserScreen extends React.Component {
     constructor(props){
         super(props);
         this.state = {
             user: null,
+            userInformations: null,
+            lastNameEditable: false,
+            firstNameEditable:  false,
+            emailEditable: false
         };
     }
 
@@ -24,10 +41,8 @@ export default class UserScreen extends React.Component {
                             console.log(error.message)
                         });
                 }).catch(error => {
-                alert(error.message);
-            });
-
-
+                    alert(error.message);
+                });
         } catch (error) {
             console.log(error.toString());
         }
@@ -37,14 +52,16 @@ export default class UserScreen extends React.Component {
         // Retrieve the current user
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
-                user.updateProfile({
-                    displayName: 'Florian LE MOAL'
-                });
-                console.log(user.displayName);
-
-                this.setState({
-                    user: user,
-
+                const rootReference = firebase.database().ref();
+                const usersReference = rootReference.child("users");
+                usersReference.child(user.uid).once("value").then(userInformations => {
+                    this.setState({
+                        user: user,
+                        userInformations: userInformations.val(),
+                        lastName: userInformations.val().lastName,
+                        firstName: userInformations.val().firstName,
+                        email: userInformations.val().email
+                    });
                 });
             }
         });
@@ -53,43 +70,117 @@ export default class UserScreen extends React.Component {
 
     render(){
 
-
-
+        if (!this.state.userInformations) {
+            return  (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator size="large" color={Colors.tintColor} />
+                </View>
+            )
+        }
         return(
-            <View style={[styles.container]}>
+            <ScrollView style={[styles.container]}>
 
                 <Image style={styles.user}
                        source={require('../../assets/user.png')}/>
 
                 <View style={styles.inputsRow}>
-                    <Text style={[styles.nom]}>{this.state.user ? this.state.user.displayName : ''}</Text>
+                    <TextInput
+                        style={[styles.input, {fontWeight: "bold"}]}
+                        placeholderTextColor = "#999999"
+                        placeholder='Nom'
+                        value={this.state.lastName}
+                        onChangeText={(lastName) => this.setState({lastName: lastName})}
+                        editable={this.state.lastNameEditable}
+                    />
+                    <Icon
+                        name={
+                            Platform.OS === 'ios'
+                                ? `ios-create`
+                                : 'md-create'
+                        }
+                    />
+                </View>
+                <View style={styles.inputsRow}>
+                    <TextInput
+                        style={[styles.input, {fontWeight: "bold"}]}
+                        placeholderTextColor = "#999999"
+                        placeholder='Prénom'
+                        value={this.state.firstName}
+                        onChangeText={(firstName) => this.setState({firstName: firstName})}
+                        editable={this.state.firstNameEditable}
+                    />
+                    <Icon
+                        name={
+                            Platform.OS === 'ios'
+                                ? `ios-create`
+                                : 'md-create'
+                        }
+                    />
                 </View>
                 <TouchableOpacity
                     style={[styles.button, {marginBottom: 30}]}
                     onPress={() => this._logout()}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>{this.state.user ? this.state.user.email : ''}</Text>
-                    <Button title="Modifier"/>
+                <View style={styles.inputsEdit}>
+                    <TextInput
+                        style={styles.input}
+                        placeholderTextColor = "#999999"
+                        placeholder='Email'
+                        value={this.state.email}
+                        onChangeText={(email) => this.setState({email: email})}
+                        editable={this.state.emailEditable}
+                    />
+                    <Icon
+                        name={
+                            Platform.OS === 'ios'
+                                ? `ios-create`
+                                : 'md-create'
+                        }
+                    />
                 </View>
 
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>xxxxxxxxxxxxxxxx</Text>
-                    <Button title="Modifier"/>
+                <View style={styles.inputsEdit}>
+                    <TextInput
+                        style={styles.input}
+                        placeholderTextColor = "#999999"
+                        placeholder='Password'
+                        value={this.state.password}
+                        onChangeText={(password) => this.setState({password: password})}
+                        editable={this.state.passwordEditable}
+                    />
+                    <Icon
+                        name={
+                            Platform.OS === 'ios'
+                                ? `ios-create`
+                                : 'md-create'
+                        }
+                    />
                 </View>
 
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>+33 643565490</Text>
-                    <Button title="Modifier"/>
+                <View style={styles.inputsEdit}>
+                    <TextInput
+                        style={styles.input}
+                        placeholderTextColor = "#999999"
+                        placeholder='Email'
+                        value={this.state.phone}
+                        onChangeText={(phone) => this.setState({phone: phone})}
+                        editable={this.state.phoneEditable}
+                    />
+                    <Icon
+                        name={
+                            Platform.OS === 'ios'
+                                ? `ios-create`
+                                : 'md-create'
+                        }
+                    />
                 </View>
 
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>Carte d'identité</Text>
-                    <Button title="Modifier"/>
+                <View style={styles.inputsEdit}>
+                    <Text>CI</Text>
                 </View>
 
-            </View>
+            </ScrollView>
         );
     }
 
@@ -100,6 +191,13 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         marginBottom: 20
+    },
+
+    loaderContainer: {
+        ...StyleSheet.absoluteFillObject,
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
     },
 
     user: {
@@ -125,49 +223,27 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
 
-    nom: {
-        fontWeight: "bold",
-        marginTop: 10,
-        fontSize: 24,
-        marginRight: 5,
-    },
-
-    prenom: {
-        fontWeight: "bold",
-        marginTop: 10,
-        display: "flex",
-        justifyContent: "space-around",
-        fontSize: 24,
-        marginLeft: 5,
-
-    },
-
-    modifMail: {
+    input: {
         fontWeight: "200",
         fontSize: 18,
         paddingRight: 60,
         marginTop: 8,
     },
 
-    modif: {
-        fontWeight: "200",
-        marginTop: 30,
-        fontSize: 18,
-    },
-
-
     inputsRow: {
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
         marginTop: 15,
+        alignItems: "center"
     },
 
-    inputsModify: {
+    inputsEdit: {
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
         marginTop: 10,
+        alignItems: "center"
     },
 
 });
