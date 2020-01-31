@@ -36,7 +36,6 @@ export default class UserScreen extends React.Component {
     componentDidMount = () => {
         // Retrieve the current user
         firebase.auth().onAuthStateChanged(user => {
-            console.log(user.lastLoginAt);
             if(user) {
                 user.updateProfile({
                     displayName: 'Florian LE MOAL'
