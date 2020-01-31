@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, TextInput, Image, TouchableOpacity, Text, StyleSheet} from 'react-native'
+import {View, TextInput, Image, TouchableOpacity, Text, StyleSheet, Dimensions} from 'react-native'
 import firebase from "firebase";
 import {onLogin} from '../Auth'
 
@@ -13,6 +13,14 @@ export default class RegisterScreen extends React.Component {
             password: "",
         }
     }
+
+    static navigationOptions = () => ({
+        headerTitle: 
+        <Text style={styles.headerTitle}>
+            Login
+        </Text>,
+        headerTransparent: true
+    });
 
     _saveUserFirebase = async (user) => {
 
@@ -68,25 +76,25 @@ export default class RegisterScreen extends React.Component {
                 
                 <View style={styles.inputsRow}>
                     <TextInput
-                        style={[styles.input, styles.inputFlex, styles.inputFlexLeft]}
-                        placeholderTextColor = "#999999"
+                        style={[styles.input, styles.inputFlex]}
+                        placeholderTextColor={placeHolderColor}
                         placeholder='Nom'
                         onChangeText={(lastName) => this.setState({lastName: lastName})}/>
                     <TextInput
-                        style={[styles.input, styles.inputFlex, styles.inputFlexRight]}
-                        placeholderTextColor = "#999999"
+                        style={[styles.input, styles.inputFlex]}
+                        placeholderTextColor={placeHolderColor} 
                         placeholder='Prénom'
                         onChangeText={(firstName) => this.setState({firstName: firstName})}/>
                 </View>
 
                 <TextInput
                     style={[styles.input, styles.inputFull]}
-                    placeholderTextColor = "#999999"
+                    placeholderTextColor={placeHolderColor} 
                     placeholder='Email'
                     onChangeText={(email) => this.setState({email: email})}/>
                 <TextInput
                     style={[styles.input, styles.inputFull]}
-                    placeholderTextColor = "#999999"
+                    placeholderTextColor={placeHolderColor} 
                     placeholder='Password'
                     secureTextEntry={true}
                     password={true}
@@ -108,10 +116,19 @@ export default class RegisterScreen extends React.Component {
     }
 }
 
+// Screen sizes
+const viewWidth = Math.round(Dimensions.get('window').width);
+const viewHeight = Math.round(Dimensions.get('window').height);
+
 const styles = StyleSheet.create({
+    headerTitle: {
+        fontFamily: "montserrat-semibold",
+        fontSize: 18
+    },
     container: {
         display: "flex",
         flexDirection: "column",
+        justifyContent: "center",
         flex: 1,
         margin: 0,
     },
@@ -119,40 +136,33 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         height: 150,
         width: 150,
-        marginBottom: 20,
+        marginBottom: 30,
         marginTop: 80,
     },
     inputsRow: {
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-around",
+        marginHorizontal: 15
     },
     inputFlex: {
         flexGrow: 1,
         maxWidth: 150,
-    },
-    inputFlexLeft: {
-        marginLeft: 30,
-        marginRight: 15,
-    },
-    inputFlexRight: {
-        marginLeft: 15,
-        marginRight: 30,
+        marginHorizontal: 15
     },
     inputFull: {
-        marginLeft: 30,
-        marginRight: 30,
+        marginHorizontal: 30,
     },
     input: {
-        height: 40,
-        paddingLeft: 10,
         backgroundColor: '#b3cdfb',
         borderRadius: 25,
-        fontSize: 18,
-        marginTop: 30
+        fontSize: 16,
+        marginBottom: 25,
+        padding: 5,
+        paddingLeft: 20,
+        fontFamily: "montserrat-regular"
     },
     button: {
-        height: 42,
         backgroundColor: '#212580',
         marginLeft: 100,
         marginRight: 100,
@@ -163,8 +173,11 @@ const styles = StyleSheet.create({
     buttonText: {
         color:"white",
         textAlign: "center",
-        fontSize: 18,
-        marginVertical: 10
+        fontSize: 16,
+        marginVertical: 10,
+        padding: 3,
+        fontFamily: "montserrat-semibold"
     }
-
 });
+
+const placeHolderColor = "#555555"
