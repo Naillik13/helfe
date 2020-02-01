@@ -14,12 +14,6 @@ export default class HeaderIcon extends React.Component {
         }
     }
 
-    mapObject = (object, callback) => {
-        return Object.keys(object).map(function (key) {
-            return callback(key, object[key]);
-        });
-    }
-
     componentDidMount = async () => {
         let arr         = []
         let db          = await firebase.database()
