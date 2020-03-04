@@ -8,7 +8,6 @@ export default function Icon(props) {
         <Ionicons
             name={props.name}
             size={26}
-            style={{ marginBottom: -7 }}
             color={Colors.defaultColor}
         />
     );

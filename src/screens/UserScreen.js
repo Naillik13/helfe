@@ -1,20 +1,20 @@
 import React from "react"
 import {
-    TextInput,
     ScrollView,
     StyleSheet,
-    Button,
     Text,
     View,
     Image,
     TouchableOpacity,
     ActivityIndicator,
-    Platform
 } from "react-native";
 import firebase from "firebase";
 import Colors from "../constants/Colors";
 import {onSignOut} from "../Auth";
-import Icon from "../components/Icon";
+import InformationField from "../components/User/InformationField";
+import HeaderIcon from "../components/HeaderIcon";
+import FieldType from "../constants/FieldType";
+import ConfirmLogin from "../components/User/ConfirmLogin";
 
 export default class UserScreen extends React.Component {
     constructor(props){
@@ -22,11 +22,19 @@ export default class UserScreen extends React.Component {
         this.state = {
             user: null,
             userInformations: null,
-            lastNameEditable: false,
-            firstNameEditable:  false,
-            emailEditable: false
+            mustLogin: false,
+            successfulAuthentication: false
         };
     }
+
+    setMustLogin = (value) => {
+        this.setState({mustLogin: value});
+    };
+
+    setSuccessfulAuthentication = () => {
+        this.setMustLogin(false);
+        this.setState({successfulAuthentication: true})
+    };
 
     _logout = () => {
         try {
@@ -60,13 +68,23 @@ export default class UserScreen extends React.Component {
                         userInformations: userInformations.val(),
                         lastName: userInformations.val().lastName,
                         firstName: userInformations.val().firstName,
-                        email: userInformations.val().email
+                        email: userInformations.val().email,
+                        phone: userInformations.val().phone
                     });
                 });
             }
         });
 
     };
+
+    static navigationOptions = ({ navigation }) => ({
+        headerRight: (
+            <HeaderIcon
+                navigation={navigation}
+            />
+        ),
+        headerTintColor: Colors.tintColor
+    });
 
     render(){
 
@@ -78,103 +96,54 @@ export default class UserScreen extends React.Component {
             )
         }
         return(
-            <ScrollView style={[styles.container]}>
+            <ScrollView style={styles.container}>
+                <ConfirmLogin
+                    email={this.state.email}
+                    mustLogin={this.state.mustLogin}
+                    successfulAuthentication={this.state.successfulAuthentication}
+                    setSuccessfulAuthentication={this.setSuccessfulAuthentication}
+                    />
 
                 <Image style={styles.user}
                        source={require('../../assets/user.png')}/>
+                <View style={{flex:1, marginHorizontal: 15, justifyContent: "center"}}>
+                    <View style={styles.headerFields}>
+                        <InformationField
+                            value={this.state.lastName}
+                            type={FieldType.lastName}
+                            styles={{fontWeight: 'bold'}}
+                        />
+                        <View style={{width: 15}}/>
+                        <InformationField
+                            value={this.state.firstName}
+                            type={FieldType.firstName}
+                            styles={{fontWeight: 'bold'}}
+                        />
+                    </View>
+                </View>
 
-                <View style={styles.inputsRow}>
-                    <TextInput
-                        style={[styles.input, {fontWeight: "bold"}]}
-                        placeholderTextColor = "#999999"
-                        placeholder='Nom'
-                        value={this.state.lastName}
-                        onChangeText={(lastName) => this.setState({lastName: lastName})}
-                        editable={this.state.lastNameEditable}
-                    />
-                    <Icon
-                        name={
-                            Platform.OS === 'ios'
-                                ? `ios-create`
-                                : 'md-create'
-                        }
-                    />
-                </View>
-                <View style={styles.inputsRow}>
-                    <TextInput
-                        style={[styles.input, {fontWeight: "bold"}]}
-                        placeholderTextColor = "#999999"
-                        placeholder='Prénom'
-                        value={this.state.firstName}
-                        onChangeText={(firstName) => this.setState({firstName: firstName})}
-                        editable={this.state.firstNameEditable}
-                    />
-                    <Icon
-                        name={
-                            Platform.OS === 'ios'
-                                ? `ios-create`
-                                : 'md-create'
-                        }
-                    />
-                </View>
                 <TouchableOpacity
                     style={[styles.button, {marginBottom: 30}]}
                     onPress={() => this._logout()}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
-                <View style={styles.inputsEdit}>
-                    <TextInput
-                        style={styles.input}
-                        placeholderTextColor = "#999999"
-                        placeholder='Email'
-                        value={this.state.email}
-                        onChangeText={(email) => this.setState({email: email})}
-                        editable={this.state.emailEditable}
-                    />
-                    <Icon
-                        name={
-                            Platform.OS === 'ios'
-                                ? `ios-create`
-                                : 'md-create'
-                        }
-                    />
-                </View>
+                <InformationField
+                    value={this.state.email}
+                    type={FieldType.email}
+                    successfulAuthentication={this.state.successfulAuthentication}
+                    setMustLogin={this.setMustLogin}
+                />
+                <InformationField
+                    value={this.state.password}
+                    type={FieldType.password}
+                    successfulAuthentication={this.state.successfulAuthentication}
+                    setMustLogin={this.setMustLogin}
+                />
 
-                <View style={styles.inputsEdit}>
-                    <TextInput
-                        style={styles.input}
-                        placeholderTextColor = "#999999"
-                        placeholder='Password'
-                        value={this.state.password}
-                        onChangeText={(password) => this.setState({password: password})}
-                        editable={this.state.passwordEditable}
-                    />
-                    <Icon
-                        name={
-                            Platform.OS === 'ios'
-                                ? `ios-create`
-                                : 'md-create'
-                        }
-                    />
-                </View>
-
-                <View style={styles.inputsEdit}>
-                    <TextInput
-                        style={styles.input}
-                        placeholderTextColor = "#999999"
-                        placeholder='Email'
-                        value={this.state.phone}
-                        onChangeText={(phone) => this.setState({phone: phone})}
-                        editable={this.state.phoneEditable}
-                    />
-                    <Icon
-                        name={
-                            Platform.OS === 'ios'
-                                ? `ios-create`
-                                : 'md-create'
-                        }
-                    />
-                </View>
+                <InformationField
+                    value={this.state.phone}
+                    type={FieldType.phone}
+                />
 
                 <View style={styles.inputsEdit}>
                     <Text>CI</Text>
@@ -222,28 +191,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginVertical: 10,
     },
-
-    input: {
-        fontWeight: "200",
-        fontSize: 18,
-        paddingRight: 60,
-        marginTop: 8,
-    },
-
-    inputsRow: {
-        display: "flex",
+    headerFields: {
+        flex: 1,
         flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 15,
+        justifyContent: "space-between",
         alignItems: "center"
-    },
-
-    inputsEdit: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 10,
-        alignItems: "center"
-    },
+    }
 
 });
