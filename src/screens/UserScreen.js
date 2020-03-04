@@ -1,15 +1,40 @@
 import React from "react"
-import {StyleSheet, Button, Text, View, Image, TouchableOpacity} from "react-native";
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+    ActivityIndicator,
+} from "react-native";
 import firebase from "firebase";
+import Colors from "../constants/Colors";
 import {onSignOut} from "../Auth";
+import InformationField from "../components/User/InformationField";
+import HeaderIcon from "../components/HeaderIcon";
+import FieldType from "../constants/FieldType";
+import ConfirmLogin from "../components/User/ConfirmLogin";
 
 export default class UserScreen extends React.Component {
     constructor(props){
         super(props);
         this.state = {
             user: null,
+            userInformations: null,
+            mustLogin: false,
+            successfulAuthentication: false
         };
     }
+
+    setMustLogin = (value) => {
+        this.setState({mustLogin: value});
+    };
+
+    setSuccessfulAuthentication = () => {
+        this.setMustLogin(false);
+        this.setState({successfulAuthentication: true})
+    };
 
     _logout = () => {
         try {
@@ -24,10 +49,8 @@ export default class UserScreen extends React.Component {
                             console.log(error.message)
                         });
                 }).catch(error => {
-                alert(error.message);
-            });
-
-
+                    alert(error.message);
+                });
         } catch (error) {
             console.log(error.toString());
         }
@@ -37,59 +60,96 @@ export default class UserScreen extends React.Component {
         // Retrieve the current user
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
-                user.updateProfile({
-                    displayName: 'Florian LE MOAL'
-                });
-                console.log(user.displayName);
-
-                this.setState({
-                    user: user,
-
+                const rootReference = firebase.database().ref();
+                const usersReference = rootReference.child("users");
+                usersReference.child(user.uid).once("value").then(userInformations => {
+                    this.setState({
+                        user: user,
+                        userInformations: userInformations.val(),
+                        lastName: userInformations.val().lastName,
+                        firstName: userInformations.val().firstName,
+                        email: userInformations.val().email,
+                        phone: userInformations.val().phone
+                    });
                 });
             }
         });
 
     };
 
+    static navigationOptions = ({ navigation }) => ({
+        headerRight: (
+            <HeaderIcon
+                navigation={navigation}
+            />
+        ),
+        headerTintColor: Colors.tintColor
+    });
+
     render(){
 
-
-
+        if (!this.state.userInformations) {
+            return  (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator size="large" color={Colors.tintColor} />
+                </View>
+            )
+        }
         return(
-            <View style={[styles.container]}>
+            <ScrollView style={styles.container}>
+                <ConfirmLogin
+                    email={this.state.email}
+                    mustLogin={this.state.mustLogin}
+                    successfulAuthentication={this.state.successfulAuthentication}
+                    setSuccessfulAuthentication={this.setSuccessfulAuthentication}
+                    />
 
                 <Image style={styles.user}
                        source={require('../../assets/user.png')}/>
-
-                <View style={styles.inputsRow}>
-                    <Text style={[styles.nom]}>{this.state.user ? this.state.user.displayName : ''}</Text>
+                <View style={{flex:1, marginHorizontal: 15, justifyContent: "center"}}>
+                    <View style={styles.headerFields}>
+                        <InformationField
+                            value={this.state.lastName}
+                            type={FieldType.lastName}
+                            styles={{fontWeight: 'bold'}}
+                        />
+                        <View style={{width: 15}}/>
+                        <InformationField
+                            value={this.state.firstName}
+                            type={FieldType.firstName}
+                            styles={{fontWeight: 'bold'}}
+                        />
+                    </View>
                 </View>
+
                 <TouchableOpacity
                     style={[styles.button, {marginBottom: 30}]}
                     onPress={() => this._logout()}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>{this.state.user ? this.state.user.email : ''}</Text>
-                    <Button title="Modifier"/>
+                <InformationField
+                    value={this.state.email}
+                    type={FieldType.email}
+                    successfulAuthentication={this.state.successfulAuthentication}
+                    setMustLogin={this.setMustLogin}
+                />
+                <InformationField
+                    value={this.state.password}
+                    type={FieldType.password}
+                    successfulAuthentication={this.state.successfulAuthentication}
+                    setMustLogin={this.setMustLogin}
+                />
+
+                <InformationField
+                    value={this.state.phone}
+                    type={FieldType.phone}
+                />
+
+                <View style={styles.inputsEdit}>
+                    <Text>CI</Text>
                 </View>
 
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>xxxxxxxxxxxxxxxx</Text>
-                    <Button title="Modifier"/>
-                </View>
-
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>+33 643565490</Text>
-                    <Button title="Modifier"/>
-                </View>
-
-                <View style={styles.inputsModify}>
-                    <Text style={styles.modifMail}>Carte d'identité</Text>
-                    <Button title="Modifier"/>
-                </View>
-
-            </View>
+            </ScrollView>
         );
     }
 
@@ -100,6 +160,13 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         marginBottom: 20
+    },
+
+    loaderContainer: {
+        ...StyleSheet.absoluteFillObject,
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
     },
 
     user: {
@@ -124,50 +191,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginVertical: 10,
     },
-
-    nom: {
-        fontWeight: "bold",
-        marginTop: 10,
-        fontSize: 24,
-        marginRight: 5,
-    },
-
-    prenom: {
-        fontWeight: "bold",
-        marginTop: 10,
-        display: "flex",
-        justifyContent: "space-around",
-        fontSize: 24,
-        marginLeft: 5,
-
-    },
-
-    modifMail: {
-        fontWeight: "200",
-        fontSize: 18,
-        paddingRight: 60,
-        marginTop: 8,
-    },
-
-    modif: {
-        fontWeight: "200",
-        marginTop: 30,
-        fontSize: 18,
-    },
-
-
-    inputsRow: {
-        display: "flex",
+    headerFields: {
+        flex: 1,
         flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 15,
-    },
-
-    inputsModify: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 10,
-    },
+        justifyContent: "space-between",
+        alignItems: "center"
+    }
 
 });
