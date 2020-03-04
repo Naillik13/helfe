@@ -7,7 +7,7 @@ import _ from 'lodash'
 
 export default class HeaderIcon extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
 
         this.state = {
             alert_arr: []
@@ -15,25 +15,25 @@ export default class HeaderIcon extends React.Component {
     }
 
     componentDidMount = async () => {
-        let arr         = []
-        let db          = await firebase.database()
+        let arr         = [];
+        let db          = await firebase.database();
         let snapshot    = await db.ref('alerts').once('value');
-        let values      = await snapshot.val()
-        let array_val   = _.toArray(values)
+        let values      = await snapshot.val();
+        let array_val   = _.toArray(values);
 
         array_val.map(val => {
             if(val.status !== "closed") {
                 arr.push(val)
             }
-        })
+        });
 
         this.setState({
             alert_arr: this.state.alert_arr.concat(arr)
         });
-    }
+    };
 
     render() {
-        let { alert_arr } = this.state
+        let { alert_arr } = this.state;
         return (
             <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Text style={{color: "#fff", marginRight: 3}}>{alert_arr.length > 0 ? alert_arr.length : "0"}</Text>
