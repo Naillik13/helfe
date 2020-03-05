@@ -1,8 +1,9 @@
 import React from "react"
-import {StyleSheet, TouchableOpacity, TextInput, View, Text} from "react-native";
+import {Platform, StyleSheet, TouchableOpacity, TextInput, View, Text} from "react-native";
 import firebase from "firebase";
 import FieldType from "../../constants/FieldType";
 import Colors from "../../constants/Colors";
+import Icon from "../Icon";
 
 export default class InformationField extends React.Component {
     constructor(props){
@@ -78,34 +79,41 @@ export default class InformationField extends React.Component {
     };
     
     render(){
+        let button = <Text style={styles.editText}>Modifier</Text>;
+
+        if (this.state.type === FieldType.lastName || this.state.type === FieldType.firstName) {
+            button = <Icon
+                name={
+                    Platform.OS === 'ios'
+                        ? `ios-create`
+                        : 'md-create'
+                }
+            />;
+        }
 
         return (
 
-            <View>
-                <View style={[styles.inputsRow, this.state.success ? styles.success : null]}>
-                    <TextInput
-                        ref="field"
-                        style={[styles.input, this.props.styles]}
-                        placeholderTextColor = "#999999"
-                        placeholder={this.state.type.placeHolder}
-                        value={this.state.value}
-                        onChangeText={(value) => this.setState({value: value})}
-                        onSubmitEditing={() => this._updateDatabaseField()}
-                        editable={this.state.isEditable}
-                        secureTextEntry={FieldType.password === this.state.type}
-                        returnKeyLabel='send'
-                    />
-                    <TouchableOpacity
-                        onPress={() => this._focusField()}
-                        style={{flex: 1, alignItems: "flex-end"}}
-                    >
-
-                        <Text style={styles.editText}>Modifier</Text>
-                    </TouchableOpacity>
-
-                </View>
-
+            <View style={[styles.inputsRow, this.state.success ? styles.success : null]}>
+                <TextInput
+                    ref="field"
+                    style={[styles.input, this.props.styles]}
+                    placeholderTextColor = "#999999"
+                    placeholder={this.state.type.placeHolder}
+                    value={this.state.value}
+                    onChangeText={(value) => this.setState({value: value})}
+                    onSubmitEditing={() => this._updateDatabaseField()}
+                    editable={this.state.isEditable}
+                    secureTextEntry={FieldType.password === this.state.type}
+                    returnKeyLabel='send'
+                />
+                <TouchableOpacity
+                    onPress={() => this._focusField()}
+                    style={{flex: 1, alignItems: "flex-end"}}
+                >
+                    {button}
+                </TouchableOpacity>
             </View>
+
         );
     }
 
@@ -134,8 +142,7 @@ const styles = StyleSheet.create({
 
     editText: {
         color: Colors.defaultColor,
-        fontSize: 16,
-
+        fontSize: 16
     }
 
 });
