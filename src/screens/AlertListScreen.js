@@ -27,7 +27,7 @@ export default class AlertListScreen extends React.Component {
     _getAlerts = async (db = firebase.database()) => {
 
         // get alerts
-        let snapshot = await db.ref('alerts').once('value');
+        let snapshot    = await db.ref('alerts').once('value');
 
         try {
             const object_alert = await snapshot.val();
@@ -35,7 +35,7 @@ export default class AlertListScreen extends React.Component {
             if (object_alert !== undefined && object_alert != null) {
                 return object_alert
             } else {
-                console.log("not alert for the moment")
+                console.error("not alert for the moment")
             }
 
 
@@ -104,14 +104,22 @@ export default class AlertListScreen extends React.Component {
         var is_started
         var new_arr = []
         alerts_array.map(alert => {
-            // Set state if not empty
-            let interval  = new Date().getTime() - new Date(alert[0].sendAt * 1000).getTime();
-            interval = Math.round(((interval % 86400000) % 3600000) / 60000);
 
-            is_started = alert.filter(item => item.status !== "closed")
-            new_arr.push(is_started)
+            is_started = alert.find(item => {
+                return item.status !== "closed"
+            })
 
-            Object.assign(new_object, {status: is_started[0].status, interval: interval});
+            if (is_started !== undefined) {
+
+                let interval  = new Date().getTime() - new Date(is_started.sendAt * 1000).getTime();
+                interval = Math.round(((interval % 86400000) % 3600000) / 60000);
+
+
+                new_arr.push(is_started)
+
+                Object.assign(new_object, {status: is_started.status, interval: interval});
+            }
+
 
         });
 
@@ -120,7 +128,7 @@ export default class AlertListScreen extends React.Component {
         new_arr.map((item, i) => {
 
             try {
-                var user_filter = users_with_alerts.find(user => item[0].emitter === user[0].uid)
+                var user_filter = users_with_alerts.find(user => item.emitter === user[0].uid)
 
                 // Set state if not empty
                 let new_obj = new Object();
